@@ -5,7 +5,7 @@ import { TimeSlot } from './timeslots.entity';
 import { CreateTimeSlotDto, UpdateTimeSlotDto, GetTimeSlotsDto } from './dto';
 
 @Injectable()
-export class TimeslotsService {
+export class TimeSlotsService {
   constructor(
     @InjectRepository(TimeSlot)
     private timeslotsRepository: Repository<TimeSlot>,

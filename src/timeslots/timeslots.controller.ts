@@ -1,13 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
-import { TimeslotsService } from './timeslots.service';
+import { TimeSlotsService } from './timeslots.service';
 import { CreateTimeSlotDto, UpdateTimeSlotDto, GetTimeSlotsDto, SortOrder } from './dto';
 import { TimeSlot } from './timeslots.entity';
 
 @ApiTags('timeslots')
 @Controller('timeslots')
-export class TimeslotsController {
-  constructor(private readonly timeslotsService: TimeslotsService) { }
+export class TimeSlotsController {
+  constructor(private readonly TimeSlotsService: TimeSlotsService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new timeslot' })
@@ -15,7 +15,7 @@ export class TimeslotsController {
   @ApiResponse({ status: 201, description: 'The timeslot has been successfully created.', type: TimeSlot })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   create(@Body() createTimeSlotDto: CreateTimeSlotDto): Promise<TimeSlot> {
-    return this.timeslotsService.create(createTimeSlotDto);
+    return this.TimeSlotsService.create(createTimeSlotDto);
   }
 
   @Get()
@@ -27,7 +27,7 @@ export class TimeslotsController {
   @ApiQuery({ name: 'unitId', required: false, description: 'Filter by unit ID', example: 'unitId' })
   @ApiResponse({ status: 200, description: 'Return all timeslots with pagination, sorting, and filtering.', type: [TimeSlot] })
   findAll(@Query() getTimeSlotsDto: GetTimeSlotsDto): Promise<{ data: TimeSlot[]; total: number; page: number; limit: number }> {
-    return this.timeslotsService.findAll(getTimeSlotsDto);
+    return this.TimeSlotsService.findAll(getTimeSlotsDto);
   }
 
   @Get(':id')
@@ -36,7 +36,7 @@ export class TimeslotsController {
   @ApiResponse({ status: 200, description: 'Return the timeslot.', type: TimeSlot })
   @ApiResponse({ status: 404, description: 'Timeslot not found.' })
   findOne(@Param('id') id: string): Promise<TimeSlot> {
-    return this.timeslotsService.findOne(id);
+    return this.TimeSlotsService.findOne(id);
   }
 
   @Patch(':id')
@@ -46,7 +46,7 @@ export class TimeslotsController {
   @ApiResponse({ status: 200, description: 'The timeslot has been successfully updated.', type: TimeSlot })
   @ApiResponse({ status: 404, description: 'Timeslot not found.' })
   update(@Param('id') id: string, @Body() updateTimeSlotDto: UpdateTimeSlotDto): Promise<TimeSlot> {
-    return this.timeslotsService.update(id, updateTimeSlotDto);
+    return this.TimeSlotsService.update(id, updateTimeSlotDto);
   }
 
   @Delete(':id')
@@ -55,6 +55,6 @@ export class TimeslotsController {
   @ApiResponse({ status: 204, description: 'The timeslot has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Timeslot not found.' })
   remove(@Param('id') id: string): Promise<void> {
-    return this.timeslotsService.remove(id);
+    return this.TimeSlotsService.remove(id);
   }
 }
