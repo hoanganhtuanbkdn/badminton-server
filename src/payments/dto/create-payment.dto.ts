@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsDecimal } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreatePaymentDto {
   @IsString()
@@ -25,7 +25,7 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   transaction_id: string;
 
-  @IsDecimal()
+  @IsNumber()
   amount: number;
 
   @IsString()

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsDecimal, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBookingDto {
@@ -22,7 +22,7 @@ export class CreateBookingDto {
     description: 'Total amount for the booking',
     example: 150000,
   })
-  @IsDecimal()
+  @IsNumber()
   totalAmount: number;
 
   @ApiProperty({

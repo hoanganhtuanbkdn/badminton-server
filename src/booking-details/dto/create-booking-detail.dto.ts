@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsDecimal } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateBookingDetailDto {
   @IsString()
@@ -13,6 +13,6 @@ export class CreateBookingDetailDto {
   @IsNotEmpty()
   timeSlotId: string;
 
-  @IsDecimal()
+  @IsNumber()
   duration: number;
 }

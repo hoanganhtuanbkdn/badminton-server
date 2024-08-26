@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsDecimal } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTimeSlotDto {
@@ -22,14 +22,14 @@ export class CreateTimeSlotDto {
     description: 'Fixed fee for booking during this time slot',
     example: 100000,
   })
-  @IsDecimal()
+  @IsNumber()
   fixedFee: number;
 
   @ApiProperty({
     description: 'Walk-in fee for booking during this time slot',
     example: 150000,
   })
-  @IsDecimal()
+  @IsNumber()
   walkInFee: number;
 
   @ApiProperty({

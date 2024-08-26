@@ -30,14 +30,14 @@ export class TimeSlot {
     description: 'Fixed fee for booking during this time slot',
     example: 100000,
   })
-  @Column('decimal', { name: 'fixed_fee' })
+  @Column({ name: 'fixed_fee', nullable: true, })
   fixedFee: number;
 
   @ApiProperty({
     description: 'Walk-in fee for booking during this time slot',
     example: 150000,
   })
-  @Column('decimal', { name: 'walk_in_fee' })
+  @Column({ name: 'walk_in_fee', nullable: true, })
   walkInFee: number;
 
   @ApiProperty({

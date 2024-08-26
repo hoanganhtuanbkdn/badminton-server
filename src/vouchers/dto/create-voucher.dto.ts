@@ -1,11 +1,11 @@
-import { IsString, IsDecimal, IsDate, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, IsDate, IsNotEmpty } from 'class-validator';
 
 export class CreateVoucherDto {
   @IsString()
   @IsNotEmpty()
   code: string;
 
-  @IsDecimal()
+  @IsNumber()
   discount_percentage: number;
 
   @IsDate()
