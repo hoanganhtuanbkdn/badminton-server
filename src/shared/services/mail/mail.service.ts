@@ -1,7 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 
-import { ShareMeAffordabilitycalCulator } from 'src/history-affordability-calculator/dtos/share-me-affordabilitycal-culator.dto';
 import { dollarFormat } from 'src/shared/constants';
 import { NotifyMeFirstTimeType } from './interface/notifyMeFirstTimeType';
 import { ShareMeType } from './interface/shareMeType';
@@ -222,7 +221,7 @@ export class MailService {
     }
   }
 
-  async sendMailShareHistoryAffordabilityCalculator(data: ShareMeAffordabilitycalCulator) {
+  async sendMailShareHistoryAffordabilityCalculator(data: any) {
     try {
       await this.mailerService.sendMail({
         to: data.email,

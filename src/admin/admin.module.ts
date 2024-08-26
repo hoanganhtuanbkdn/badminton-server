@@ -2,7 +2,6 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AgencyModule, AgencyService } from 'src/agency';
 import { SharedModule } from 'src/shared/shared.module';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
@@ -10,17 +9,14 @@ import { AdminRoleController, AdminRoleService } from './admin_roles';
 import { AdminPermissionController, AdminPermissionService } from './admin_permissions';
 import { AdminRolePermissionController, AdminRolePermissionService } from './admin_roles_permissons';
 import { AdminPermission, AdminProfile, AdminRole, AdminRolePermission } from './entities';
-import { Agency } from 'src/agency/entities';
-import { EmailService } from 'src/email/email.service';
 
 @Module({
   controllers: [AdminController, AdminRoleController, AdminPermissionController, AdminRolePermissionController],
   providers: [AdminService, JwtService, AdminPermissionService, AdminRoleService, AdminRolePermissionService],
   imports: [
     SharedModule,
-    TypeOrmModule.forFeature([AdminPermission, AdminProfile, AdminRolePermission, AdminRole, Agency]),
+    TypeOrmModule.forFeature([AdminPermission, AdminProfile, AdminRolePermission, AdminRole,]),
     ConfigModule,
-    AgencyModule,
   ],
   exports: [AdminService, AdminPermissionService, AdminRoleService],
 })

@@ -3,9 +3,7 @@ import { CrudValidationGroups } from '@nestjsx/crud';
 import * as bcrypt from 'bcryptjs';
 import { Exclude } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
-import { Note } from 'src/note/entities/note.entity';
 import { ACCOUNT_STATUS, REGEX_PASSWORD, requireFieldLength, requireFieldMinLength } from 'src/shared/constants';
-import { Tag } from 'src/tag/entities/tag.entity';
 import {
   BaseEntity,
   BeforeInsert,
@@ -124,12 +122,6 @@ export class AdminProfile extends BaseEntity {
   })
   @IsOptional({ groups: [CREATE, UPDATE] })
   status: ACCOUNT_STATUS;
-
-  @OneToMany(() => Note, note => note.creator)
-  notes: Note[];
-
-  @OneToMany(() => Tag, tag => tag.creator)
-  tags: Tag[];
 
   @CreateDateColumn({ name: 'create_date' })
   createDate: Date;

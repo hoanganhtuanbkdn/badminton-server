@@ -17,9 +17,7 @@ import { Repository } from 'typeorm';
 
 import { REDIS_KEY_FORGOT, REDIS_KEY_SIGNIN } from './constants';
 import { AdminProfile, AdminRole, AdminRolePermission } from './entities';
-import { AgencyService } from 'src/agency';
 import { AuthLoginAdminDto, OTPEmailDTO, ResetPasswordDTO } from './dtos';
-import { Agency } from 'src/agency/entities';
 
 @Injectable()
 export class AdminService extends TypeOrmCrudService<AdminProfile> {
@@ -30,10 +28,7 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
     private readonly adminRolePermissionRepository: Repository<AdminRolePermission>,
     @InjectRepository(AdminProfile)
     private readonly adminProfileRepository: Repository<AdminProfile>,
-    @InjectRepository(Agency)
-    private readonly agencyRepository: Repository<Agency>,
     private jwtService: JwtService,
-    private agencyService: AgencyService,
     private commonService: CommonService,
     @InjectRedis() private readonly redis: Redis,
     private mailService: MailService,
@@ -86,94 +81,6 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
         },
       };
 
-    }
-
-    const agency = await this.agencyService.findOne({
-      where: { email },
-    });
-
-    console.log('agency', agency);
-
-    if (agency) {
-      if (agency.status === AGENCY_STATUS.INACTIVE) {
-        // throw BaseError.ACCOUNT_INACTIVE_UNABLE_TO_PROCEED();
-        throw new HttpException(
-          {
-            inactiveAccount: true,
-            message: 'Your account is inactive',
-          },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      // ctx: RequestContext, userData: { password: string, email: string, firstName: string, lastName: string }, password: string
-
-      await this.validateEmailPassword(agency, password, ROLE.AGENT);
-
-      if (!agency.resetPasswordDefaut) {
-        const key32digits = generateRandomStringKey();
-        const key_forgot = `user:${REDIS_KEY_FORGOT}:${key32digits}`;
-
-        await this.redis.setex(key_forgot, parseInt(process.env.TIME_EXPIRED_OTP_EMAIL_FORGOT), email);
-        return {
-          data: {
-            email,
-            verifyType: 'email',
-            roles: [ROLE.AGENT],
-            user: {
-              id: agency.id,
-              userName: agency.userName,
-              primaryPhone: agency.phone,
-              firstName: agency.firstName,
-              lastName: agency.lastName,
-              roles: [ROLE.AGENT],
-              email: agency.email,
-              createdAt: agency.createdAt.toString(),
-              updatedAt: agency.updatedAt.toString(),
-              imagePath: agency.imagePath,
-              resetPasswordDefaut: agency.resetPasswordDefaut,
-              keyResetPasswordDefaut: key32digits
-            },
-          },
-        };
-      } else {
-        const dataPermission = await this.getPermission(ROLE.AGENT);
-
-        const authToken = await this.generateTokenAdmin({
-          id: agency.id,
-          email: agency.email,
-          roles: [ROLE.AGENT],
-        });
-
-        return {
-          data: {
-            email,
-            verifyType: 'email',
-            roles: [ROLE.AGENT],
-            ...authToken,
-            user: {
-              id: agency.id,
-              userName: agency.userName,
-              primaryPhone: agency.phone,
-              firstName: agency.firstName,
-              lastName: agency.lastName,
-              roles: [ROLE.AGENT],
-              email: agency.email,
-              createdAt: agency.createdAt.toString(),
-              updatedAt: agency.updatedAt.toString(),
-              imagePath: agency.imagePath,
-              resetPasswordDefaut: agency.resetPasswordDefaut,
-
-            },
-            rolePermission: dataPermission
-          },
-        };
-
-      }
-    }
-
-    if (!admin && !agency) {
-      throw BaseError.EMAIL_NOT_EXIST();
     }
   }
   async loginResentOTP(email: string): Promise<{
@@ -238,36 +145,19 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
         role: true,
       },
     });
-    const agency = await this.agencyService.findOne({
-      where: { email, status: AGENCY_STATUS.ACTIVE },
-    });
 
-    if (!admin && !agency) {
-      throw BaseError.EMAIL_NOT_EXIST();
-    } else if (admin) {
-      try {
-        const test = await this.commonService.sendOtpToEmail(email, admin.firstName, admin.lastName, REDIS_KEY_FORGOT);
-        console.log('test', test);
-        return true;
-      } catch (error) {
-        throw new BadRequestException(error);
-      }
-    } else if (agency) {
-      try {
-        const test = await this.commonService.sendOtpToEmail(email, agency.firstName, agency.lastName, REDIS_KEY_FORGOT);
-        console.log('test', test);
 
-        return true;
-      } catch (error) {
-        throw new BadRequestException(error);
-      }
-    } else {
-      throw BaseError.EMAIL_NOT_EXIST();
 
+    try {
+      const test = await this.commonService.sendOtpToEmail(email, admin.firstName, admin.lastName, REDIS_KEY_FORGOT);
+      console.log('test', test);
+      return true;
+    } catch (error) {
+      throw new BadRequestException(error);
     }
   }
 
-  async postResetPassword(payload: ResetPasswordDTO): Promise<boolean> {
+  async postResetPassword(payload: ResetPasswordDTO) {
     // check match password
     const { resetKey, newPassword } = payload;
 
@@ -281,7 +171,6 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
       const keyRedis = `user:${REDIS_KEY_FORGOT}:${resetKey}`;
 
       const email = await this.redis.get(`${keyRedis}`);
-      console.log(email, 'email');
       if (email) {
         const admin = await this.adminProfileRepository.findOne({
           where: { email: email, status: ACCOUNT_STATUS.ACTIVE },
@@ -289,12 +178,7 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
             role: true,
           },
         });
-        const agency = await this.agencyService.findOne({
-          where: { email: email, status: AGENCY_STATUS.ACTIVE },
-        });
-        if (!admin && !agency) {
-          throw BaseError.EMAIL_NOT_EXIST();
-        } else if (admin) {
+        if (admin) {
           const salt = await bcrypt.genSalt(10);
           const hashedPasswordBcrypt = await bcrypt.hash(newPassword, salt);
           await this.adminProfileRepository.update(admin.id, {
@@ -306,21 +190,7 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
           await this.redis.del(keyRedis);
 
           await this.mailService.sendChangePasswordSuccessEmail(admin.email, admin.firstName + ' ' + admin.lastName);
-        } else if (agency) {
-          const salt = await bcrypt.genSalt(10);
-          const hashedPasswordBcrypt = await bcrypt.hash(newPassword, salt);
-          await this.agencyRepository.update(agency.id, {
-            ...agency,
-            salt,
-            password: hashedPasswordBcrypt,
-            resetPasswordDefaut: true
-          });
-
-          await this.redis.del(keyRedis);
-
-          await this.mailService.sendChangePasswordSuccessEmail(agency.email, agency.firstName + ' ' + agency.lastName);
         }
-        return true;
       } else {
         throw new BadRequestException('Time out, please try reset password process again!');
       }
@@ -405,10 +275,6 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
             await this.adminProfileRepository.update(userData.id, {
               status: ACCOUNT_STATUS.LOCKED
             });
-          } else if (role === ROLE.AGENT) {
-            await this.agencyRepository.update(userData.id, {
-              status: AGENCY_STATUS.LOCKED
-            });
           }
 
           throw new HttpException(
@@ -451,10 +317,6 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
       if (role === ROLE.SUPER_ADMIN && userData.status === ACCOUNT_STATUS.LOCKED) {
         await this.adminProfileRepository.update(userData.id, {
           status: ACCOUNT_STATUS.ACTIVE
-        });
-      } else if (role === ROLE.AGENT && userData.status === AGENCY_STATUS.LOCKED) {
-        await this.agencyRepository.update(userData.id, {
-          status: AGENCY_STATUS.ACTIVE
         });
       }
       return true;

@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
-import { AgencyService } from 'src/agency/agency.service';
 import { ROLE } from 'src/auth/constants/role.constant';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { TAuthenticationJWT } from 'src/shared/constants';
@@ -59,7 +58,6 @@ import { AdminRoleService } from './admin_roles';
 export class AdminController implements CrudController<AdminProfile> {
   constructor(
     public service: AdminService,
-    public agencyService: AgencyService,
     public adminRoleService: AdminRoleService,
   ) { }
 
@@ -92,21 +90,8 @@ export class AdminController implements CrudController<AdminProfile> {
           ...authToken,
         },
       };
-    } else {
-      const agency = await this.agencyService.findById(ctx.user.id);
-      const authToken = await this.service.generateTokenAdmin({
-        id: agency.id,
-        email: agency.email,
-        roles: [ROLE.AGENT],
-      });
-      return {
-        data: {
-          email: agency.email,
-          roles: [ROLE.AGENT],
-          ...authToken,
-        },
-      };
     }
+
   }
 
   @HttpCode(HttpStatus.OK)
@@ -157,10 +142,6 @@ export class AdminController implements CrudController<AdminProfile> {
       const admin = await this.service.getAdminByToken(ctx.user.id);
 
       return admin;
-    } else {
-      const agency = await this.agencyService.findById(ctx.user.id);
-
-      return agency;
     }
   }
 
@@ -182,7 +163,7 @@ export class AdminController implements CrudController<AdminProfile> {
   @UseInterceptors(ClassSerializerInterceptor)
   @Public()
   @Post('reset-password')
-  resetPassword(@Body() payload: ResetPasswordDTO): Promise<boolean> {
+  resetPassword(@Body() payload: ResetPasswordDTO) {
     return this.service.postResetPassword(payload);
   }
 
