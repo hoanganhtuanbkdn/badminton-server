@@ -11,9 +11,6 @@ import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { configModuleOptions } from './shared/configs/module-options';
 import { SharedModule } from './shared/shared.module';
-import { AttachmentModule } from './attachment/attachment.module';
-import { NotificationModule } from './notification/notification.module';
-
 
 @Module({
   imports: [
@@ -30,8 +27,6 @@ import { NotificationModule } from './notification/notification.module';
     ScheduleModule.forRoot(),
     AdminModule,
     HttpModule,
-    AttachmentModule,
-    NotificationModule,
   ],
   controllers: [AppController],
   providers: [
