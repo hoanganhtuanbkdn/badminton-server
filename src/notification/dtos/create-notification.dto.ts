@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
-import { Lead } from 'src/lead/entities/lead.entity';
 
 export class CreateNotificationDto {
   @IsNotEmpty()
@@ -17,6 +16,4 @@ export class CreateNotificationDto {
   @IsOptional()
   isRead?: boolean = false;
 
-  @IsOptional()
-  lead: Lead;
 }

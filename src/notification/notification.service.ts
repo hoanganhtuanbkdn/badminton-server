@@ -2,7 +2,6 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository, UpdateResult } from 'typeorm';
 import { Notification } from './notification.entity';
-import { Lead } from 'src/lead/entities/lead.entity';
 import { GetNotificationsDto } from './dtos/get-notifications.dto';
 import { CreateNotificationDto } from './dtos/create-notification.dto';
 
@@ -11,8 +10,7 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private notificationRepository: Repository<Notification>,
-    @InjectRepository(Lead)
-    private leadRepository: Repository<Lead>,
+
   ) { }
 
   async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
@@ -47,16 +45,6 @@ export class NotificationService {
     const notification = await this.notificationRepository.findOne({ where: { id } });
     if (!notification) {
       throw new NotFoundException('Notification not found');
-    }
-
-    if (updateNotificationDto.leadId) {
-      const lead = await this.leadRepository.findOne({ where: { id: updateNotificationDto.leadId } });
-      if (!lead) {
-        throw new NotFoundException('Lead not found');
-      }
-      notification.lead = lead;
-      notification.leadId = lead.id;
-      notification.content = `${lead.id} đã gửi email đến bạn`;
     }
 
     return this.notificationRepository.save(notification);
