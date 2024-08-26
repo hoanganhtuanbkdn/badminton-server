@@ -14,7 +14,7 @@ import { MailService } from './services/mail/mail.service';
 
 @Module({
   imports: [ConfigModule, ORMModule, AppLoggerModule, MailModule],
-  exports: [AppLoggerModule, ConfigModule, CommonService, MailService, SMSService, FilesService, JwtService],
+  exports: [AppLoggerModule, ConfigModule, CommonService, MailService, FilesService, JwtService],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     {
