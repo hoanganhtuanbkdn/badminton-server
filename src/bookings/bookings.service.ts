@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Booking } from './bookings.entity';
-import { CreateBookingDto, UpdateBookingDto } from './dto';
+import { CreateBookingDto, UpdateBookingDto, GetBookingsDto } from './dto';
 
 @Injectable()
 export class BookingsService {
@@ -11,25 +11,50 @@ export class BookingsService {
     private bookingsRepository: Repository<Booking>,
   ) { }
 
-  create(createBookingDto: CreateBookingDto): Promise<Booking> {
+  // Create a new booking
+  async create(createBookingDto: CreateBookingDto): Promise<Booking> {
     const booking = this.bookingsRepository.create(createBookingDto);
     return this.bookingsRepository.save(booking);
   }
 
-  findAll(): Promise<Booking[]> {
-    return this.bookingsRepository.find();
+  // Get all bookings with pagination, sorting, and filtering
+  async findAll(getBookingsDto: GetBookingsDto): Promise<{ data: Booking[]; total: number; page: number; limit: number }> {
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC', customerId, courtId } = getBookingsDto;
+
+    const where: any = {};
+    if (customerId) where.customerId = customerId;
+    if (courtId) where.courtId = courtId;
+
+    const [data, total] = await this.bookingsRepository.findAndCount({
+      where,
+      order: { [sortBy]: sortOrder },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { data, total, page, limit };
   }
 
-  findOne(id: string): Promise<Booking> {
-    return this.bookingsRepository.findOne({ where: { id } });
+  // Get a booking by ID
+  async findOne(id: string): Promise<Booking> {
+    const booking = await this.bookingsRepository.findOne({ where: { id } });
+    if (!booking) {
+      throw new NotFoundException(`Booking with ID "${id}" not found`);
+    }
+    return booking;
   }
 
+  // Update a booking by ID
   async update(id: string, updateBookingDto: UpdateBookingDto): Promise<Booking> {
-    await this.bookingsRepository.update(id, updateBookingDto);
-    return this.findOne(id);
+    const booking = await this.findOne(id);
+
+    Object.assign(booking, updateBookingDto);
+    return this.bookingsRepository.save(booking);
   }
 
+  // Delete a booking by ID
   async remove(id: string): Promise<void> {
-    await this.bookingsRepository.delete(id);
+    const booking = await this.findOne(id);
+    await this.bookingsRepository.delete(booking.id);
   }
 }

@@ -1,35 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TimeSlot } from './timeslots.entity';
-import { CreateTimeSlotDto, UpdateTimeSlotDto } from './dto';
+import { CreateTimeSlotDto, UpdateTimeSlotDto, GetTimeSlotsDto } from './dto';
 
 @Injectable()
-export class TimeSlotsService {
+export class TimeslotsService {
   constructor(
     @InjectRepository(TimeSlot)
-    private timeSlotsRepository: Repository<TimeSlot>,
+    private timeslotsRepository: Repository<TimeSlot>,
   ) { }
 
-  create(createTimeSlotDto: CreateTimeSlotDto): Promise<TimeSlot> {
-    const timeSlot = this.timeSlotsRepository.create(createTimeSlotDto);
-    return this.timeSlotsRepository.save(timeSlot);
+  // Create a new timeslot
+  async create(createTimeSlotDto: CreateTimeSlotDto): Promise<TimeSlot> {
+    const timeslot = this.timeslotsRepository.create(createTimeSlotDto);
+    return this.timeslotsRepository.save(timeslot);
   }
 
-  findAll(): Promise<TimeSlot[]> {
-    return this.timeSlotsRepository.find();
+  // Get all timeslots with pagination, sorting, and filtering
+  async findAll(getTimeSlotsDto: GetTimeSlotsDto): Promise<{ data: TimeSlot[]; total: number; page: number; limit: number }> {
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC', unitId } = getTimeSlotsDto;
+
+    const where: any = {};
+    if (unitId) where.unitId = unitId;
+
+    const [data, total] = await this.timeslotsRepository.findAndCount({
+      where,
+      order: { [sortBy]: sortOrder },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { data, total, page, limit };
   }
 
-  findOne(id: string): Promise<TimeSlot> {
-    return this.timeSlotsRepository.findOne({ where: { id } });
+  // Get a timeslot by ID
+  async findOne(id: string): Promise<TimeSlot> {
+    const timeslot = await this.timeslotsRepository.findOne({ where: { id } });
+    if (!timeslot) {
+      throw new NotFoundException(`TimeSlot with ID "${id}" not found`);
+    }
+    return timeslot;
   }
 
+  // Update a timeslot by ID
   async update(id: string, updateTimeSlotDto: UpdateTimeSlotDto): Promise<TimeSlot> {
-    await this.timeSlotsRepository.update(id, updateTimeSlotDto);
-    return this.findOne(id);
+    const timeslot = await this.findOne(id);
+
+    Object.assign(timeslot, updateTimeSlotDto);
+    return this.timeslotsRepository.save(timeslot);
   }
 
+  // Delete a timeslot by ID
   async remove(id: string): Promise<void> {
-    await this.timeSlotsRepository.delete(id);
+    const timeslot = await this.findOne(id);
+    await this.timeslotsRepository.delete(timeslot.id);
   }
 }

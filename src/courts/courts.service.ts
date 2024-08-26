@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Court } from './courts.entity';
 import { CreateCourtDto, UpdateCourtDto } from './dto';
+import { GetCourtsDto } from './dto/get-courts.dto';
 
 @Injectable()
 export class CourtsService {
@@ -16,8 +17,17 @@ export class CourtsService {
     return this.courtsRepository.save(court);
   }
 
-  findAll(): Promise<Court[]> {
-    return this.courtsRepository.find();
+  async findAll(getCourtsDto: GetCourtsDto): Promise<{ data: Court[]; total: number; page: number; limit: number }> {
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = getCourtsDto;
+
+    const [data, total] = await this.courtsRepository.findAndCount({
+      order: { [sortBy]: sortOrder },
+      skip: (page - 1) * limit,
+      take: limit,
+      // relations: ['owner'],  // Quan hệ với bảng khác, nếu cần
+    });
+
+    return { data, total, page, limit };
   }
 
   findOne(id: string): Promise<Court> {
