@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>MORTGAGE RATE TRACKING SUCCESSFULLY SET UP </title>
+
+</head>
+<style>
+  .navbar div {
+    width: calc(100% / 3);
+  }
+
+  @media screen and (max-width: 700px) {
+    .navbar div {
+      width: calc(100% / 2);
+    }
+  }
+</style>
+
+<body style="font-size: 14px; margin: auto;
+    max-width: 516px;
+    min-width: 220px;
+    color:  #333133;
+    font-family: 'Roboto',Arial,Helvetica,sans-serif;
+    ">
+  {{> header}}
+
+  <div style="margin: 24px 0; 
+color: #00B553;
+text-align: center;
+font-size: 24px;
+font-style: normal;
+font-weight: 500;
+line-height: 36px; /* 112.5% */
+letter-spacing: 0.8px;">
+
+    <p class="title">MORTGAGE RATE TRACKING SUCCESSFULLY SET UP</p>
+  </div>
+  <div style="
+    margin: auto;
+    display: table;
+  ">
+    <img src="{{ domain }}/Notify-me-email.png" />
+
+  </div>
+  <div style="margin: 24px 0; color: #333133;
+font-size: 14px;
+font-style: normal;
+line-height: 24px; /* 150% */">
+
+    <p>Dear {{ customerName }}, </p>
+    <p style="margin: 0">We're writing to let you know that you have successfully set up rate tracking on your
+      Pacificwide
+      Mortgage AI
+      Advisor account. </p>
+    <p style="margin: 0">Here are the details of your rate tracking:</p>
+  </div>
+  <div style="border-radius: 16px;
+border: 1px solid #EAC435;
+background: rgba(255, 239, 198, 0.70);
+padding: 24px;
+color: #0A090A; 
+">
+    <div style="white-space: nowrap;">
+      <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+        <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+          Loan Amount</p>
+        <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ loanAmount}}</p>
+      </div>
+      <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+        <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+          Loan Type</p>
+        <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ loanPurpose }}</p>
+      </div>
+      <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+        <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+          Loan Program</p>
+        <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ loanTerm }}</p>
+      </div>
+    </div>
+    <div style="border-radius: 16px;
+border: 1px solid #EAC435;
+background: rgba(255, 239, 198, 0.70); margin: 32px 0;"></div>
+
+    <table style="width:100%; color: #0A090A; text-align: left;">
+      <tr>
+        <th style="width:10%">Property Value</th>
+        <th style="width:30%">{{ propertyAmount }}</th>
+      </tr>
+      <tr>
+        <th style="width:10%">Occupancy Type</th>
+        <th style="width:30%">{{ occupancy }}</th>
+      </tr>
+      <tr>
+        <th style="width:10%">Property Type</th>
+        <th style="width:30%">{{ propertyType }}</th>
+      </tr>
+      <tr>
+        <th style="width:10%">Loan type</th>
+        <th style="width:30%">{{ loanPurpose }}</th>
+      </tr>
+      <tr>
+        <th style="width:10%">Zipcode</th>
+        <th style="width:30%">{{ zipCode }}</th>
+      </tr>
+      <tr>
+        <th style="width:10%">FICO Credit Score</th>
+        <th style="width:30%">{{ creditScore }}</th>
+      </tr>
+    </table>
+  </div>
+  <div style="margin: 24px 0; color: #333133;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */">
+    <p>Please note that the rate fluctuations depend on market conditions, and this notification service is intended to
+      help
+      you stay informed about these changes. We recommend consulting with your financial advisor before making any
+      decisions
+      based on these notifications.</p>
+
+    <p>You can <a href="{{ linkEditTracking }}" style="text-decoration: none">manage your rate tracking</a> preferences
+      or
+      turn
+      off these notifications at any time by visiting the settings section of your Pacificwide account.</p>
+
+    <p>If you did not request this notification or if you believe this is an error, please contact our support team
+      immediately
+      at <span style="color: #DD494D">admin@pacificwide.com</span>.</p>
+
+    <p>In case you no longer wish to receive rate alerts, please click on the "Unsubscribe" button.
+    </p>
+
+    <p>Thank you for choosing Pacificwide Mortgage. We're here to help make your mortgage experience as seamless and
+      personalized as possible.</p>
+
+    <p>Best Regards,</p>
+    <p style="margin: 0">Leon Le</p>
+    <p style="margin: 0">CEO and Founder</p>
+    <p style="margin: 0">Pacificwide Real Estate & Mortgage</p>
+
+  </div>
+  {{> footer}}
+</body>
+
+</html>

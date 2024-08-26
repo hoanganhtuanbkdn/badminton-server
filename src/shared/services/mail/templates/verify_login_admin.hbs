@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LOGIN OTP </title>
+
+</head>
+
+<body style="font-size: 14px; margin: auto;
+    max-width: 516px;
+    min-width: 220px;
+    color:  #333133;
+    font-family: 'Roboto',Arial,Helvetica,sans-serif;
+    ">
+
+    {{> header}}
+
+    <div style="margin: 24px 0; 
+color: #0A090A;
+text-align: center;
+font-size: 24px;
+font-style: normal;
+font-weight: 500;
+line-height: 36px; /* 112.5% */
+letter-spacing: 0.8px;">
+        <p>VERIFICATION CODE</p>
+    </div>
+
+    <div style="border-radius: 16px;
+border: 1px solid rgba(128, 125, 126, 0.30);
+background: rrgba(128, 125, 126, 0.30); margin: 24px 0;"></div>
+    <p>Dear {{ customerName }}, </p>
+    <p style="-top: 0">Enter the code below to sign in Pacificwide admin portal. This code will expire in 3 minutes.
+    </p>
+    <div style="color: #AC2125;
+/* Headline/Desktop/H4 */
+font-family: Bebas Neue;
+font-size: 32px;
+font-style: normal;
+font-weight: 400;
+line-height: 36px; /* 112.5% */
+letter-spacing: 5px;
+margin: 24px 0;
+">
+        {{otp}}
+    </div>
+    {{> contact_us}}
+
+    {{> footer}}
+
+</body>
+
+</div>
+
+</html>

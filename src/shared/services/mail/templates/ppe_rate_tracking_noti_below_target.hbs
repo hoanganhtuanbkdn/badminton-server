@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Notify</title>
+
+</head>
+
+<body style="font-size: 14px; margin: auto;
+    max-width: 516px;
+    min-width: 220px;
+    color:  #333133;
+    font-family: 'Roboto',Arial,Helvetica,sans-serif;
+    ">
+    {{> header}}
+
+    <div style="margin: 24px 0; 
+color: #0A090A;
+text-align: center;
+font-size: 24px;
+font-style: normal;
+font-weight: 500;
+line-height: 36px; /* 112.5% */
+letter-spacing: 0.8px;">
+        <p>YOUR CUSTOMIZED RATES. OUR BEST RATES YET.</p>
+    </div>
+    <div style="border-radius: 16px;
+border: 1px solid  rgba(128, 125, 126, 0.30); 
+background: rgba(128, 125, 126, 0.30); margin: 24px 0;"></div>
+
+    <div style="margin: 24px 0; color: #333133;
+font-weight: 700;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */">
+        <p>Dear {{ customerName }}, </p>
+        <p>I am delighted to inform you that the mortgage rates have been reduced lately, and the rate
+            you were looking for is now accessible.</p>
+        <p>This is a fantastic opportunity for you to save some money and work towards achieving your
+            financial aspirations. Below is a summary of the alert and the current mortgage market rates:</p>
+    </div>
+
+    <div style="border-radius: 12px;
+border: 1px solid rgba(128, 125, 126, 0.30);
+background:  #FFFDFD;
+padding: 24px;
+color: #0A090A; 
+">
+        <style>
+            table {
+                font-family: Roboto, Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            td,
+            th {
+                text-align: left;
+                padding: 12px;
+            }
+
+            td {
+                border-top: 1px solid #dddddd;
+
+            }
+
+            tr:nth-child(even) {}
+        </style>
+        <div>
+            <table>
+                <tr>
+                    <th style="width:25%">Interest</th>
+                    <th style="width:25%">APR</th>
+                    <th style="width:25%">Points/ Lender Credits</th>
+                    <th style="width:25%">Payment (P+I)</th>
+                </tr>
+                {{#each dataRate}}
+
+                <tr style="font-size: 12px;">
+                    <td>{{ rate }}%</td>
+                    <td>{{ apr }}%</td>
+                    {{#if check }}
+                    <td style="color: #F5403C">{{ credit }}</td>
+                    {{else}}
+                    <td style="color: #00B553">{{ credit }}</td>
+                    {{/if}}
+                    <td>{{ payment }}</td>
+                </tr>
+                {{/each}}
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <p>These rates are current as of {{time}} </p>
+    <p style="text-align: left; color: #AC2125"><a style="text-decoration: none;"
+            href="{{domain}}/mortgage-disclosure">View Legal Disclosures</a></p>
+
+    <div style="text-align: center; white-space: nowrap;">
+        <a href="https://apps.pacificwide.com/app/signup/p/pacificwide/" style="text-decoration: none;  border-radius: 40px;
+background-color: #AC2125;
+padding: 8px;
+align-items: center;
+border: none;
+color: #FFFDFD;
+text-align: center;
+
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 20px;
+display: inline-block;
+    width: 40%;
+    min-width: 160px;
+    white-space: normal;
+">
+            Get my pre-approval
+        </a>
+        <a href="{{domain}}/calendly" style="text-decoration: none; border-radius: 40px;
+border: 1px solid  #AC2125;
+background-color: #FFFDFD;
+padding: 8px;
+color: #AC2125;
+text-align: center;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 20px; 
+display: inline-block;
+    width: 40%;
+    min-width: 160px;
+    white-space: normal;
+">
+            Schedule a call
+        </a>
+    </div>
+
+
+    <div style="border-radius: 16px;
+border: 1px solid rgba(128, 125, 126, 0.30);
+background: rrgba(128, 125, 126, 0.30); margin: 24px 0;"></div>
+    <p style="color: #333133;
+
+/* Body/Desktop/B3 */
+font-weight: 700;
+font-size: 14px;
+font-style: normal;
+line-height: 24px; /* 150% */">Here is a summary of the information you provided and the values you are looking for:
+    </p>
+    <div style="white-space: nowrap;">
+        <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+            <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+                Loan Amount</p>
+            <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ loanAmount}}</p>
+        </div>
+        <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+            <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+                Loan Type</p>
+            <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ loanPurpose}}</p>
+        </div>
+        <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+            <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+                Loan Program</p>
+            <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ loanTerm}}</p>
+        </div>
+    </div>
+
+    <div style="white-space: nowrap;">
+        <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+            <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+                Target Rate</p>
+            <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ targetRate}} %</p>
+        </div>
+        <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+            <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+                Target Points/Credits</p>
+            <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ targetPoint}}</p>
+        </div>
+        <div style="display: inline-block;
+    width: 33%;
+    white-space: normal;">
+            <p style="margin: 4px; margin-top: 10px; font-size: 14px;">
+                Target Monthly Payment</p>
+            <p style=" margin: 8px 0px 0px;
+ font-size: 16px;
+font-weight: 800;">{{ targetMonthlyPayment}}</p>
+        </div>
+    </div>
+
+    <br>
+    </div>
+    <table style="width:100%; color: #0A090A;">
+        <tr>
+            <th style="width:10%">Property Value</th>
+            <th style="width:30%">{{ propertyAmount }}</th>
+        </tr>
+        <tr>
+            <th style="width:10%">Occupancy Type</th>
+            <th style="width:30%">{{ occupancy }}</th>
+        </tr>
+        <tr>
+            <th style="width:10%">Property Type</th>
+            <th style="width:30%">{{ propertyType }}</th>
+        </tr>
+        <tr>
+            <th style="width:10%">Loan type</th>
+            <th style="width:30%">{{ loanPurpose }}</th>
+        </tr>
+        <tr>
+            <th style="width:10%">Zipcode</th>
+            <th style="width:30%">{{ zipCode }}</th>
+        </tr>
+        <tr>
+            <th style="width:10%">FICO Credit Score</th>
+            <th style="width:30%">{{ creditScore }}</th>
+        </tr>
+    </table>
+    <br>
+
+    <p style="text-align: left; margin: 0;">If you want to modify your rate tracking notifications, simply click on the
+        "Edit
+        Notification" option. </p>
+    <p style="text-align: left; margin: 0;">In case you no longer wish to receive rate alerts, please click on the
+        "Unsubscribe"
+        button.</p>
+    <br>
+
+    <div style="text-align: center;">
+        <a style="width: calc(100% / 2); margin: 6px; text-decoration: none;  border-radius: 40px;
+background-color: #AC2125;
+padding: 8px;
+align-items: center;
+border: none;
+color: #FFFDFD;
+text-align: center;
+
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 20px;
+display: inline-block;
+    width: 40%;
+    min-width: 160px;
+    white-space: normal;" href="https://apps.pacificwide.com/app/signup/p/pacificwide/">
+            Edit Notification
+        </a>
+    </div>
+    {{> footer}}
+
+    <div style="text-align: center;">
+        <a style="text-decoration: none;" href="{{ linkUnsubscribe }}">
+            <span style="
+      text-decoration: none;
+    border-radius: 40px;
+    border: 1px solid #AC2125;
+    background: #FFFDFD;
+    padding: 8px;
+    text-align: center;
+    color: #AC2125;
+    font-weight: 500;
+    width: fit-content;
+    margin: auto; 
+    ">Unsubscribe from this email<span>
+        </a>
+    </div>
+
+</body>
+
+</div>
+
+</html>

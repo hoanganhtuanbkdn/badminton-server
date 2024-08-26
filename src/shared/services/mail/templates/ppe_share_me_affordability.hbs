@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Share rate</title>
+
+</head>
+
+
+
+<body style="font-size: 14px; margin: auto;
+    max-width: 516px;
+    min-width: 220px;
+    color:  #333133;
+    font-family: 'Roboto',Arial,Helvetica,sans-serif;
+    ">
+    {{> header}}
+    <div>
+        <div style="margin: 24px 0; 
+                color: #0A090A; 
+text-align: center;
+/* Headline/Desktop/H4 */
+font-size: 24px;
+font-style: normal;
+font-weight: 500;
+line-height: 36px; /* 112.5% */
+letter-spacing: 0.8px;">
+            <p>UNLOCK YOUR BUYING POWER</p>
+
+        </div>
+        <div style="background: rgba(127.50, 124.95, 125.55, 0.30)">
+        </div>
+        <div>
+            <div style="margin: 24px 0; color: #333133;
+
+/* Body/Desktop/B3 */
+font-size: 14px;
+font-style: normal;
+line-height: 24px; /* 150% */">
+
+                <p>Dear {{ customerName }}, </p>
+                <p style="margin: 0">I'm
+                    writing to you today to update you on your home buying power. Based on your summary information
+                    you provided as below.
+                </p>
+
+            </div>
+        </div>
+        <table style="width:100%; color: #0A090A; text-align: left; border-spacing: 0px; margin: 24px 0px;">
+            <tr style="background: #F5F5F5;
+">
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Annual household income</th>
+                <th style="width:50%; padding: 6px 8px;">{{ annualIncome }}</th>
+            </tr>
+            <tr>
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Monthly debt</th>
+                <th style="width:50%; padding: 6px 8px;">{{ monthlyDebt }}</th>
+            </tr>
+            <tr style="background: #F5F5F5; padding: 6px 8px;
+align-items: center;
+gap: 8px;">
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">DTI</th>
+                <th style="width:50%; padding: 6px 8px;">{{ DTI }}</th>
+            </tr>
+            <tr>
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Cash</th>
+                <th style="width:50%; padding: 6px 8px;">{{ downPayment }}</th>
+            </tr>
+            <tr style="background: #F5F5F5; padding: 6px 8px;
+align-items: center;
+gap: 8px;">
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Location</th>
+                <th style="width:50%; padding: 6px 8px;">{{ zipcode }}</th>
+            </tr>
+            <tr>
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Mortgage loan term</th>
+                <th style="width:50%; padding: 6px 8px;">{{ loanTerm }}</th>
+            </tr>
+            <tr style="background: #F5F5F5; padding: 6px 8px;
+align-items: center;
+gap: 8px;">
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Interest rate</th>
+                <th style="width:50%; padding: 6px 8px;">{{ rate }}</th>
+            </tr>
+            <tr>
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">HOA dues</th>
+                <th style="width:50%; padding: 6px 8px;">{{ hoa }}</th>
+            </tr>
+            <tr style="background: #F5F5F5; padding: 6px 8px;
+align-items: center;
+gap: 8px;">
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Other expenses</th>
+                <th style="width:50%; padding: 6px 8px;">{{ otherFees }}</th>
+            </tr>
+            <tr>
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Home insurance</th>
+                <th style="width:50%; padding: 6px 8px;">{{ homeInsurance }}</th>
+            </tr>
+            <tr style="background: #F5F5F5; padding: 6px 8px;
+align-items: center;
+gap: 8px;">
+                <th style="width:50%; padding: 6px 8px; font-weight: 400;">Property tax</th>
+                <th style="width:50%; padding: 6px 8px;">{{ propertyTaxPercent }}</th>
+            </tr>
+            <th style="width:50%; padding: 6px 8px; font-weight: 400;">Private mortgage insurance (PMI)</th>
+            <th style="width:50%; padding: 6px 8px;">{{ pmiPercentaged }}</th>
+            </tr>
+        </table>
+        <div style="align-self: stretch;"><span>This
+                means that you can afford to buy a home worth up to</span><span>
+            </span><span style="color: #2CAF21;">{{ estPropertyValue }}</span><span>.</span>
+        </div>
+        <div style="align-self: stretch;  margin: 24px 0px;"><span>There
+                is the home list which match with your home buy power, click the hyper link to view all the
+                list:</span>
+            <span><a style="color: #216DAC; text-decoration: none; font-weight: bold;" href="{{queryString}}">Home
+                    list</a></span>
+            <span>.</span>
+        </div>
+        <div style="text-align: center; white-space: nowrap;">
+            <a style="text-decoration: none;  border-radius: 40px;
+background-color: #AC2125;
+padding: 8px;
+align-items: center;
+border: none;
+color: #FFFDFD;
+text-align: center;
+
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 20px;
+display: inline-block;
+    width: 40%;
+    min-width: 160px;
+    white-space: normal;
+" href="https://apps.pacificwide.com/app/signup/p/pacificwide/">
+                Update your information
+            </a>
+            <a href="{{domain}}/calendly" style="text-decoration: none; border-radius: 40px;
+border: 1px solid  #AC2125;
+background-color: #FFFDFD;
+padding: 8px;
+color: #AC2125;
+text-align: center;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 20px; 
+display: inline-block;
+     width: 40%;
+    min-width: 160px;
+    white-space: normal;
+">
+                Schedule a call
+            </a>
+        </div>
+    </div>
+    {{> footer}}
+</body>
+
+</html>

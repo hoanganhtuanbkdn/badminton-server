@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>YOUR ACCOUNT HAS BEEN TEMPORARILY LOCKED </title>
+
+</head>
+<style>
+  .navbar div {
+    width: calc(100% / 3);
+  }
+
+  @media screen and (max-width: 700px) {
+    .navbar div {
+      width: calc(100% / 2);
+    }
+  }
+</style>
+
+<body style="font-size: 14px; margin: auto;
+    max-width: 516px;
+    min-width: 220px;
+    color:  #333133;
+    font-family: 'Roboto',Arial,Helvetica,sans-serif;
+    ">
+  {{> header}}
+
+  <div style="margin: 24px 0; 
+color: #00B553;
+text-align: center;
+/* Headline/Desktop/H4 */
+font-family: BebasNeue;
+font-size: 32px;
+font-style: normal;
+font-weight: 400;
+line-height: 36px; /* 112.5% */
+letter-spacing: 0.8px;">
+    <p style="margin: 0">LOCK ACCOUNT</p>
+    <p style="color:  #333133;
+text-align: center;
+margin: 0;
+
+/* Body/Desktop/B2 Bold */
+font-family: Gilroy-Bold;
+font-size: 20px;
+font-style: normal;
+font-weight: 400;
+line-height: 28px; /* 140% */">Your account has been lock</p>
+  </div>
+  <div style="border-radius: 16px;
+border: 1px solid rgba(128, 125, 126, 0.30);
+background: rrgba(128, 125, 126, 0.30); margin: 24px 0;"></div>
+  <p>Dear {{ customerName }}, </p>
+  <p style="margin: 24px 0;">
+  <p>Your Pacificwide Real Estate & Mortgage account has been temporarily locked due to security concerns. We detected
+    suspicious activity associated with your account and are taking precautionary measures to safeguard your
+    information. </p>
+  <p style="margin: 24px 0;">
+
+  <p>
+    To unlock your account, please contact our customer support team at admin@pacificwide.com. We apologize for any
+    inconvenience caused and appreciate your patience as we work to secure your account.
+  </p>
+
+  <p style="margin: 24px 0;">
+
+  <p>Sincerely,</p>
+  The Pacificwide Real Estate & Mortgage Team
+  {{> footer}}
+</body>
+
+</html>

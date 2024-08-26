@@ -1,0 +1,52 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - dev-v2
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Notify Slack - Deployment Starting
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚀 Build notification from the Github Action for app: https://github.com/Pacificwide-Real-Estate-Mortgage-CRM/website_ms_server. Your build status is STARTED. Go to https://github.com/Pacificwide-Real-Estate-Mortgage-CRM/website_ms_server/actions to view details on your build.\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Check SSH PEM Key
+        run: |
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "SSH_PRIVATE_KEY is not set or is empty."
+          else
+            echo "SSH_PRIVATE_KEY is set and available."
+          fi
+
+      - name: Add SSH key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/website_ms_server_v2.pem
+          chmod 600 /tmp/website_ms_server_v2.pem
+
+      - name: Add known hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        run: |
+          ssh -i /tmp/website_ms_server_v2.pem -p 22 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@13.211.141.144 'sh deploy.sh'
+
+      - name: Cleanup
+        run: rm /tmp/website_ms_server_v2.pem
+
+      - name: Notify Slack
+        if: always()
+        run: |
+          SLACK_MESSAGE="🎉 Build notification from the Github Action for app: https://github.com/Pacificwide-Real-Estate-Mortgage-CRM/website_ms_server. Your build status is SUCCEED. Go to https://api.pacificwide.code4change.dev/website/api/v1/swagger to view details on your build."
+          if [ "${{ job.status }}" != "success" ]; then
+            SLACK_MESSAGE="❌ Build notification from the Github Action for app: https://github.com/Pacificwide-Real-Estate-Mortgage-CRM/website_ms_server. Your build status is FAILED. Check the build details here: ${BUILD_URL}."
+          fi
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"${SLACK_MESSAGE}\"}" ${{ secrets.SLACK_WEBHOOK_URL }}

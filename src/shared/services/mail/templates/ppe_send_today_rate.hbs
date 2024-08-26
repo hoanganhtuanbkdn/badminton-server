@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Today rate</title>
+
+</head>
+<style>
+  .navbar div {
+    width: calc(100% / 3);
+  }
+
+  @media screen and (max-width: 700px) {
+    .navbar div {
+      width: calc(100% / 2);
+    }
+  }
+</style>
+
+<body style="font-size: 14px; margin: auto;
+    max-width: 516px;
+    min-width: 220px;
+    color:  #333133;
+    font-family: 'Roboto',Arial,Helvetica,sans-serif;
+    ">
+  {{> header}}
+  <div style="margin: 24px 0; 
+color: #00B553;
+text-align: center;
+/* Headline/Desktop/H4 */
+font-family: 'Roboto',Arial,Helvetica,sans-serif;
+font-size: 24px;
+font-style: normal;
+font-weight: 500;
+line-height: 36px; /* 112.5% */
+letter-spacing: 0.8px;">
+    <p>UNLOCK BETTER RATES TOGETHER. SHARE. COMPARE. PROSPER.</p>
+
+  </div>
+  <div style="
+    margin: auto;
+    display: table;
+  ">
+    <img src="{{ domain }}/Notify-me-email.png" />
+
+  </div>
+  <div style="margin: 24px 0; color: #333133;
+
+/* Body/Desktop/B3 */
+font-family: 'Roboto',Arial,Helvetica,sans-serif;
+font-size: 14px;
+font-style: normal;
+line-height: 24px; /* 150% */">
+
+    <p>Dear {{ customerName }}, </p>
+
+    <p style="margin: 0">At Pacificwide, we understand the importance of finding the best mortgage rates to secure your
+      dream home or optimize your financial situation. That's why we have developed a unique platform where you can
+      share and compare mortgage rates with fellow users, leading to a more informed decision-making process.
+    </p>
+    <p style="margin: 0">Below is a summary of your mortgage market rates:
+    </p>
+  </div>
+  <div style="border-radius: 12px;
+border: 1px solid rgba(128, 125, 126, 0.30);
+background-color:  #FFFDFD;
+padding: 12px;
+color: #0A090A; 
+">
+    <style>
+      table {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td,
+      th {
+        text-align: left;
+        padding: 4px;
+      }
+
+      td {
+        border-top: 1px solid #dddddd;
+
+      }
+
+      tr:nth-child(even) {}
+    </style>
+    <div>
+      <table>
+        <tr>
+          <th style="width:20%">Loan term</th>
+          <th style="width:20%">Interest</th>
+          <th style="width:20%">APR</th>
+          <th style="width:20%">Points/ Lender Credits</th>
+          <th style="width:20%">Payment (P+I)</th>
+        </tr>
+        {{#each dataAllRate}}
+
+        <tr style="font-size: 12px;">
+          <td>{{ label }}</td>
+          <td>{{ rate }}%</td>
+          <td>{{ apr }}%</td>
+          {{#if check }}
+          <td style="color: #F5403C">{{ credit }}</td>
+          {{else}}
+          <td style="color: #00B553">{{ credit }}</td>
+          {{/if}}
+          <td> {{ payment }}</td>
+        </tr>
+        {{/each}}
+
+      </table>
+
+    </div>
+
+  </div>
+  <div style="text-align: center; margin: auto;">
+    <a style="text-decoration: none;  border-radius: 40px;
+background-color: #AC2125;
+padding: 8px;
+align-items: center;
+border: none;
+color: #FFFDFD;
+text-align: center;
+
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 20px;
+display: inline-block;
+     width: 40%;
+    min-width: 160px;
+    white-space: normal;
+    margin-top: 20px;
+" href="{{ domain }}/all-rates">
+      View Detail
+    </a>
+  </div>
+  {{> footer}}
+
+  <div style="text-align: center; margin-bottom: 22px;">
+    <a style="text-decoration: none;" href="{{ linkUnsubscribe }}">
+      <span style="
+      text-decoration: none;
+    border-radius: 40px;
+    border: 1px solid #AC2125;
+    background: #FFFDFD;
+    padding: 8px;
+    text-align: center;
+    color: #AC2125;
+    font-weight: 500;
+    width: fit-content;
+    margin: auto; 
+    ">Unsubscribe from this email<span>
+    </a>
+  </div>
+</body>
+
+</html>

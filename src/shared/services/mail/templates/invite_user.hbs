@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Notify first time</title>
+
+</head>
+<style>
+  .navbar div {
+    width: calc(100% / 3);
+  }
+
+  @media screen and (max-width: 700px) {
+    .navbar div {
+      width: calc(100% / 2);
+    }
+  }
+</style>
+
+<body style="font-size: 14px; margin: auto;
+    max-width: 516px;
+    min-width: 220px;
+    color:  #333133;
+    font-family: 'Roboto',Arial,Helvetica,sans-serif;
+    ">
+  {{> header}}
+
+  <div style="margin: 24px 0; 
+color: #00B553;
+text-align: center;
+font-size: 24px;
+font-style: normal;
+font-weight: 500;
+line-height: 36px; /* 112.5% */
+letter-spacing: 0.8px;">
+
+    <p class="title">PACIFICWIDE ADMIN PORTAL - ACCOUNT INFORMATION
+    </p>
+  </div>
+  <div style="border-radius: 16px;
+border: 1px solid rgba(128, 125, 126, 0.30);
+background: rrgba(128, 125, 126, 0.30); margin: 24px 0;"></div>
+  <p>Dear {{ customerName }}, </p>
+  <p style="margin: 24px 0;">
+  <p>Welcome to Pacificwide - Admin portal! Please sign in: <a href="{{ domain }}" style="text-decoration: none">{{
+      domain }}</a> with the information about your account:
+  </p>
+
+  <p>
+    Email Address: <b>{{ email }}</b>
+  </p>
+  <p>
+    Password: <b>{{ password }}</b>
+  </p>
+
+  <p>Please note that you can update your account information at any time by signing into your account on our
+    website.</p>
+  <p>If you have any questions or need assistance, please do not hesitate to contact us at (408) 532-1278 or
+    mortgage@pacificwide.com.</p>
+  <p>Thank you for being a part of Pacificwide!</p>
+
+  <p>Sincerely,</p>
+  The Pacificwide Real Estate & Mortgage Team
+  {{> footer}}
+</body>
+
+</html>

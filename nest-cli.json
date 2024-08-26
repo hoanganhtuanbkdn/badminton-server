@@ -1,0 +1,25 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "assets": [
+      {
+        "include": "shared/services/mail/fonts",
+        "outDir": "dist/src",
+        "watchAssets": true
+      },
+      {
+        "include": "shared/services/mail/images",
+        "outDir": "dist/src",
+        "watchAssets": true
+      },
+      {
+        "include": "shared/services/mail/templates",
+        "outDir": "dist/src",
+        "watchAssets": true
+      },
+      "*/templates/**/*.hbs"
+    ],
+    "watchAssets": true
+  }
+}

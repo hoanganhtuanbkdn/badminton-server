@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>A Short Refinance Application Notification</title>
+
+</head>
+<style>
+  .navbar div {
+    width: calc(100% / 3);
+  }
+
+  @media screen and (max-width: 700px) {
+    .navbar div {
+      width: calc(100% / 2);
+    }
+  }
+</style>
+
+<body style="font-size: 16px; margin: auto;
+    max-width: 516px;
+    min-width: 220px;
+    color:  #333133;
+    font-family: 'Roboto',Arial,Helvetica,sans-serif;
+    ">
+  {{> header}}
+
+  <div style="margin: 24px 0; 
+color: #151515;
+text-align: center;
+font-size: 24px;
+font-style: normal;
+font-weight: 500;
+line-height: 36px; /* 112.5% */
+letter-spacing: 0.8px;">
+
+    <p class="title">A Short Refinance Application Notification
+    </p>
+  </div>
+  <div style="border-radius: 16px;
+border: 1px solid rgba(128, 125, 126, 0.30);
+background: rrgba(128, 125, 126, 0.30); margin: 24px 0;"></div>
+  <p>Dear <span style="color: #1778FB;">{{ agentName }}</span>, </p>
+  <p style="margin: 24px 0;">
+  <p> <span style="color: #1778FB;">{{ leadName }}</span> has successfully submitted a refinance application. You can
+    find further details in the attached
+    document.</p>
+
+  <p>Best regards,</p>
+  The Pacificwide Real Estate & Mortgage Team
+  {{> footer}}
+</body>
+
+</html>
