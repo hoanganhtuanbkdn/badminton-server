@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsOptional, IsString, IsNumber, IsEnum } from 'class-validator';
 
 export enum SortOrder {
@@ -10,11 +11,13 @@ export class GetBookingsDto {
   @ApiPropertyOptional({ description: 'Page number', example: 1 })
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   page?: number = 1;
 
   @ApiPropertyOptional({ description: 'Number of items per page', example: 10 })
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   limit?: number = 10;
 
   @ApiPropertyOptional({ description: 'Field to sort by', example: 'createdAt' })

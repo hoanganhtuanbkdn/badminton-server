@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Customer } from 'src/customers/customers.entity';
 import { Court } from 'src/courts/courts.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
@@ -65,13 +65,12 @@ export class Booking {
   @Column({ name: 'booking_type' })
   bookingType: string;
 
-  @ApiProperty({
-    description: 'Creation date of the booking',
-    example: '2024-08-24T14:48:00.000Z',
-  })
-  @Column({ name: 'created_at' })
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
+  @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
+  updatedAt: Date;
   @ApiProperty({
     description: 'List of booking details associated with this booking',
     type: () => [BookingDetail],
