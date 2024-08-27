@@ -37,6 +37,27 @@ export class Owner {
   phoneNumber: string;
 
   @ApiProperty({
+    description: 'Name of the account holder receiving the payment',
+    example: 'John Doe',
+  })
+  @Column()
+  accountHolder: string;
+
+  @ApiProperty({
+    description: 'Name of the bank where the account is held',
+    example: 'Bank of America',
+  })
+  @Column()
+  bankName: string;
+
+  @ApiProperty({
+    description: 'Bank account number',
+    example: '1234567890',
+  })
+  @Column()
+  accountNumber: string;
+
+  @ApiProperty({
     description: 'List of courts associated with the owner',
     type: () => [Court],
   })

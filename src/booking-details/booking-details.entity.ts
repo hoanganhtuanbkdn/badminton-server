@@ -40,4 +40,11 @@ export class BookingDetail {
   })
   @Column('decimal')
   duration: number;
+
+  @ApiProperty({
+    description: 'The date when the court is booked',
+    example: '2024-08-28',
+  })
+  @Column('date')
+  bookingDate: string;
 }
