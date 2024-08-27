@@ -1,9 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn, BeforeInsert } from 'typeorm';
 import { Owner } from 'src/owners/owners.entity';
 import { Position } from 'src/positions/positions.entity';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Booking } from 'src/bookings/bookings.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { slugify } from 'src/shared/utils';
 
 @Entity('courts')
 export class Court {
@@ -20,6 +21,9 @@ export class Court {
   })
   @Column({ name: 'name' })
   name: string;
+
+  @Column({ unique: true })
+  slug: string;
 
   @ApiProperty({
     description: 'Address of the court',
@@ -100,4 +104,9 @@ export class Court {
   })
   @OneToMany(() => Booking, booking => booking.court)
   bookings: Booking[];
+
+  @BeforeInsert()
+  generateSlug() {
+    this.slug = slugify(this.name);
+  }
 }

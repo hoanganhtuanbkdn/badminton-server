@@ -51,6 +51,14 @@ export class PositionsService {
     return { data, total };
   }
 
+  async findByCourtId(courtId: string): Promise<Position[]> {
+    const court = await this.courtsRepository.findOne({ where: { id: courtId } });
+    if (!court) {
+      throw new NotFoundException(`Court with ID ${courtId} not found`);
+    }
+    return this.positionsRepository.find({ where: { courtId } });
+  }
+
   async findOne(id: string): Promise<Position> {
     const position = await this.positionsRepository.findOne({ where: { id } });
     if (!position) {

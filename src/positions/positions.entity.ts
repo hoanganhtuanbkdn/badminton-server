@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn, BeforeInsert } from 'typeorm';
 import { Court } from 'src/courts/courts.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { slugify } from 'src/shared/utils';
 
 @Entity('positions')
 export class Position {
@@ -18,6 +19,9 @@ export class Position {
   })
   @Column({ name: 'name' })
   name: string;
+
+  @Column({ unique: true })
+  slug: string;
 
   @ApiProperty({
     description: 'Description of the position (nullable)',
@@ -44,4 +48,9 @@ export class Position {
 
   @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.position)
   bookingDetails: BookingDetail[];
+
+  @BeforeInsert()
+  generateSlug() {
+    this.slug = slugify(this.name);
+  }
 }

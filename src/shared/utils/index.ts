@@ -15,3 +15,11 @@ export const sendSlackNotification = async (message: string, option?: { isSubscr
     }
   }
 };
+
+import { v4 as uuidv4 } from 'uuid';
+
+export function slugify(name: string): string {
+  const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const uniqueId = uuidv4().split('-')[0]; // Lấy phần đầu tiên của UUID để tạo tính duy nhất
+  return `${baseSlug}-${uniqueId}`;
+}

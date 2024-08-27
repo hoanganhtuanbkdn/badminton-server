@@ -28,6 +28,15 @@ export class PositionsController {
     return this.positionsService.findAll(getPositionsDto);
   }
 
+  @Get('/by-court/:courtId')
+  @ApiOperation({ summary: 'Get positions by courtId' })
+  @ApiParam({ name: 'courtId', description: 'ID of the court to retrieve positions for' })
+  @ApiResponse({ status: 200, description: 'Return positions for the specified court.', type: [Position] })
+  @ApiResponse({ status: 404, description: 'Court not found.' })
+  findByCourtId(@Param('courtId') courtId: string) {
+    return this.positionsService.findByCourtId(courtId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a position by ID' })
   @ApiParam({ name: 'id', description: 'ID of the position to retrieve' })

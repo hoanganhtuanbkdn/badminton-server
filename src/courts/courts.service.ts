@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Court } from './courts.entity';
@@ -42,6 +42,14 @@ export class CourtsService {
     });
 
     return { data, total, page, limit };
+  }
+
+  async findByOwnerId(ownerId: string): Promise<Court[]> {
+    const owner = await this.ownersRepository.findOne({ where: { id: ownerId } });
+    if (!owner) {
+      throw new NotFoundException(`Owner with ID ${ownerId} not found`);
+    }
+    return this.courtsRepository.find({ where: { ownerId } });
   }
 
   findOne(id: string): Promise<Court> {

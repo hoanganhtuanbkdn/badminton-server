@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, BeforeInsert } from 'typeorm';
 import { Court } from 'src/courts/courts.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { slugify } from 'src/shared/utils';
 
 @Entity('owners')
 export class Owner {
@@ -17,6 +18,9 @@ export class Owner {
   })
   @Column({ name: 'name' })
   name: string;
+
+  @Column({ unique: true })
+  slug: string;
 
   @ApiProperty({
     description: 'Email address of the owner',
@@ -44,4 +48,9 @@ export class Owner {
 
   @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
   updatedAt: Date;
+
+  @BeforeInsert()
+  generateSlug() {
+    this.slug = slugify(this.name);
+  }
 }

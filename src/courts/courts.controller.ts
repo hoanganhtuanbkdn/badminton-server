@@ -28,6 +28,15 @@ export class CourtsController {
     return this.courtsService.findAll(getCourtsDto);
   }
 
+  @Get('/by-owner/:ownerId')
+  @ApiOperation({ summary: 'Get courts by ownerId' })
+  @ApiParam({ name: 'ownerId', description: 'ID of the owner to retrieve courts for' })
+  @ApiResponse({ status: 200, description: 'Return courts for the specified owner.', type: [Court] })
+  @ApiResponse({ status: 404, description: 'Owner not found.' })
+  findByOwnerId(@Param('ownerId') ownerId: string) {
+    return this.courtsService.findByOwnerId(ownerId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a court by ID' })
   @ApiParam({ name: 'id', description: 'Court ID' })
