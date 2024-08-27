@@ -22,8 +22,8 @@ export class Court {
   @Column({ name: 'name' })
   name: string;
 
-  @Column({ unique: true })
-  slug: string;
+  @Column({ nullable: true })
+  slug?: string;
 
   @ApiProperty({
     description: 'Address of the court',

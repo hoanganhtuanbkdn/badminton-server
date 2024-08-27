@@ -19,8 +19,8 @@ export class Owner {
   @Column({ name: 'name' })
   name: string;
 
-  @Column({ unique: true })
-  slug: string;
+  @Column({ nullable: true })
+  slug?: string;
 
   @ApiProperty({
     description: 'Email address of the owner',
