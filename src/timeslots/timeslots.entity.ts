@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Court } from 'src/courts/courts.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -47,10 +47,18 @@ export class TimeSlot {
   updatedAt: Date;
 
   @ApiProperty({
+    description: 'Court ID associated with this time slot',
+    example: 'uuid',
+  })
+  @Column({ name: 'court_id' })
+  courtId: string;
+
+  @ApiProperty({
     description: 'Court associated with this time slot',
     type: () => Court,
   })
-  @ManyToOne(() => Court, court => court.timeSlots)
+  @ManyToOne(() => Court, court => court.timeSlots, { nullable: false })
+  @JoinColumn({ name: 'court_id' })
   court: Court;
 
   @ApiProperty({

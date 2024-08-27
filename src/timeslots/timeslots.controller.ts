@@ -7,15 +7,15 @@ import { TimeSlot } from './timeslots.entity';
 @ApiTags('timeslots')
 @Controller('timeslots')
 export class TimeSlotsController {
-  constructor(private readonly TimeSlotsService: TimeSlotsService) { }
+  constructor(private readonly timeSlotsService: TimeSlotsService) { }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new timeslot' })
+  @ApiOperation({ summary: 'Create a new time slot' })
   @ApiBody({ type: CreateTimeSlotDto })
-  @ApiResponse({ status: 201, description: 'The timeslot has been successfully created.', type: TimeSlot })
+  @ApiResponse({ status: 201, description: 'The time slot has been successfully created.', type: TimeSlot })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   create(@Body() createTimeSlotDto: CreateTimeSlotDto): Promise<TimeSlot> {
-    return this.TimeSlotsService.create(createTimeSlotDto);
+    return this.timeSlotsService.create(createTimeSlotDto);
   }
 
   @Get()
@@ -27,34 +27,34 @@ export class TimeSlotsController {
   @ApiQuery({ name: 'unitId', required: false, description: 'Filter by unit ID' })
   @ApiResponse({ status: 200, description: 'Return all timeslots with pagination, sorting, and filtering.', type: [TimeSlot] })
   findAll(@Query() getTimeSlotsDto: GetTimeSlotsDto): Promise<{ data: TimeSlot[]; total: number; page: number; limit: number }> {
-    return this.TimeSlotsService.findAll(getTimeSlotsDto);
+    return this.timeSlotsService.findAll(getTimeSlotsDto);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a timeslot by ID' })
-  @ApiParam({ name: 'id', description: 'ID of the timeslot to retrieve' })
-  @ApiResponse({ status: 200, description: 'Return the timeslot.', type: TimeSlot })
-  @ApiResponse({ status: 404, description: 'Timeslot not found.' })
+  @ApiOperation({ summary: 'Get a time slot by ID' })
+  @ApiParam({ name: 'id', description: 'ID of the time slot to retrieve' })
+  @ApiResponse({ status: 200, description: 'Return the time slot.', type: TimeSlot })
+  @ApiResponse({ status: 404, description: 'Time slot not found.' })
   findOne(@Param('id') id: string): Promise<TimeSlot> {
-    return this.TimeSlotsService.findOne(id);
+    return this.timeSlotsService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a timeslot' })
-  @ApiParam({ name: 'id', description: 'ID of the timeslot to update' })
+  @ApiOperation({ summary: 'Update a time slot' })
+  @ApiParam({ name: 'id', description: 'ID of the time slot to update' })
   @ApiBody({ type: UpdateTimeSlotDto })
-  @ApiResponse({ status: 200, description: 'The timeslot has been successfully updated.', type: TimeSlot })
-  @ApiResponse({ status: 404, description: 'Timeslot not found.' })
+  @ApiResponse({ status: 200, description: 'The time slot has been successfully updated.', type: TimeSlot })
+  @ApiResponse({ status: 404, description: 'Time slot not found.' })
   update(@Param('id') id: string, @Body() updateTimeSlotDto: UpdateTimeSlotDto): Promise<TimeSlot> {
-    return this.TimeSlotsService.update(id, updateTimeSlotDto);
+    return this.timeSlotsService.update(id, updateTimeSlotDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a timeslot' })
-  @ApiParam({ name: 'id', description: 'ID of the timeslot to delete' })
-  @ApiResponse({ status: 204, description: 'The timeslot has been successfully deleted.' })
-  @ApiResponse({ status: 404, description: 'Timeslot not found.' })
+  @ApiOperation({ summary: 'Delete a time slot' })
+  @ApiParam({ name: 'id', description: 'ID of the time slot to delete' })
+  @ApiResponse({ status: 204, description: 'The time slot has been successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Time slot not found.' })
   remove(@Param('id') id: string): Promise<void> {
-    return this.TimeSlotsService.remove(id);
+    return this.timeSlotsService.remove(id);
   }
 }

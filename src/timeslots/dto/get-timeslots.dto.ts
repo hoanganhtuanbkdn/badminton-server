@@ -27,8 +27,8 @@ export class GetTimeSlotsDto {
   @IsEnum(SortOrder)
   sortOrder?: SortOrder = SortOrder.DESC;
 
-  @ApiPropertyOptional({ description: 'Filter by unit ID' })
+  @ApiPropertyOptional({ description: 'Filter by court ID' })
   @IsOptional()
   @IsString()
-  unitId?: string;
+  courtId?: string;
 }

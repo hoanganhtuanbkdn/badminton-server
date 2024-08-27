@@ -19,17 +19,23 @@ export class TimeSlotsService {
 
   // Get all timeslots with pagination, sorting, and filtering
   async findAll(getTimeSlotsDto: GetTimeSlotsDto): Promise<{ data: TimeSlot[]; total: number; page: number; limit: number }> {
-    const { page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'DESC', unitId } = getTimeSlotsDto;
+    const { page, limit, sortBy, sortOrder, courtId } = getTimeSlotsDto;
 
-    const where: any = {};
-    if (unitId) where.unitId = unitId;
+    const queryBuilder = this.timeslotsRepository.createQueryBuilder('timeslot');
 
-    const [data, total] = await this.timeslotsRepository.findAndCount({
-      where,
-      order: { [sortBy]: sortOrder },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    if (courtId) {
+      queryBuilder.andWhere('timeslot.courtId = :courtId', { courtId });
+    }
+
+    if (sortBy && sortOrder) {
+      queryBuilder.orderBy(`timeslot.${sortBy}`, sortOrder);
+    }
+
+    if (page && limit) {
+      queryBuilder.skip((page - 1) * limit).take(limit);
+    }
+
+    const [data, total] = await queryBuilder.getManyAndCount();
 
     return { data, total, page, limit };
   }
@@ -45,15 +51,19 @@ export class TimeSlotsService {
 
   // Update a timeslot by ID
   async update(id: string, updateTimeSlotDto: UpdateTimeSlotDto): Promise<TimeSlot> {
-    const timeslot = await this.findOne(id);
-
-    Object.assign(timeslot, updateTimeSlotDto);
-    return this.timeslotsRepository.save(timeslot);
+    await this.timeslotsRepository.update(id, updateTimeSlotDto);
+    const updatedTimeSlot = await this.timeslotsRepository.findOne({ where: { id } });
+    if (!updatedTimeSlot) {
+      throw new NotFoundException(`Time slot with ID ${id} not found`);
+    }
+    return updatedTimeSlot;
   }
 
   // Delete a timeslot by ID
   async remove(id: string): Promise<void> {
-    const timeslot = await this.findOne(id);
-    await this.timeslotsRepository.delete(timeslot.id);
+    const result = await this.timeslotsRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Time slot with ID ${id} not found`);
+    }
   }
 }
