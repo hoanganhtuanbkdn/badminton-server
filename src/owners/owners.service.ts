@@ -17,7 +17,7 @@ export class OwnersService {
   }
 
   async findAll(getOwnersDto: GetOwnersDto): Promise<{ data: Owner[]; total: number; page: number; limit: number }> {
-    const { page = 1, limit = 10, sortBy = 'name', sortOrder = 'DESC', name, email } = getOwnersDto;
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC', name, email } = getOwnersDto;
 
     const queryBuilder = this.ownersRepository.createQueryBuilder('owner');
 

@@ -65,12 +65,12 @@ export class Booking {
   @Column({ name: 'booking_type' })
   bookingType: string;
 
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
   updatedAt: Date;
+
   @ApiProperty({
     description: 'List of booking details associated with this booking',
     type: () => [BookingDetail],

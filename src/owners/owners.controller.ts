@@ -19,10 +19,10 @@ export class OwnersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all owners with pagination and sorting' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page', example: 10 })
-  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by', example: 'createdAt' })
-  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order', example: 'DESC' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
+  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
   @ApiResponse({ status: 200, description: 'Return all owners with pagination and sorting.', type: [Owner] })
   findAll(@Query() getOwnersDto: GetOwnersDto) {
     return this.ownersService.findAll(getOwnersDto);

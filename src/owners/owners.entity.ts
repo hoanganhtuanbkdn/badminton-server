@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Court } from 'src/courts/courts.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -38,4 +38,10 @@ export class Owner {
   })
   @OneToMany(() => Court, court => court.owner)
   courts: Court[];
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
+  updatedAt: Date;
 }

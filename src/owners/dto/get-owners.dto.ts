@@ -8,34 +8,34 @@ export enum SortOrder {
 }
 
 export class GetOwnersDto {
-  @ApiPropertyOptional({ description: 'Page number for pagination', example: 1 })
+  @ApiPropertyOptional({ description: 'Page number for pagination' })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
   page?: number = 1;
 
-  @ApiPropertyOptional({ description: 'Number of items per page for pagination', example: 10 })
+  @ApiPropertyOptional({ description: 'Number of items per page for pagination' })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
   limit?: number = 10;
 
-  @ApiPropertyOptional({ description: 'Field to sort by', example: 'name' })
+  @ApiPropertyOptional({ description: 'Field to sort by' })
   @IsOptional()
   @IsString()
   sortBy?: string = 'name';
 
-  @ApiPropertyOptional({ description: 'Sort order (ASC or DESC)', enum: SortOrder, example: SortOrder.DESC })
+  @ApiPropertyOptional({ description: 'Sort order (ASC or DESC)', enum: SortOrder })
   @IsOptional()
   @IsEnum(SortOrder)
   sortOrder?: SortOrder = SortOrder.DESC;
 
-  @ApiPropertyOptional({ description: 'Filter owners by name', example: 'John Doe' })
+  @ApiPropertyOptional({ description: 'Filter owners by name' })
   @IsOptional()
   @IsString()
   name?: string;
 
-  @ApiPropertyOptional({ description: 'Filter owners by email', example: 'john.doe@example.com' })
+  @ApiPropertyOptional({ description: 'Filter owners by email' })
   @IsOptional()
   @IsString()
   email?: string;
