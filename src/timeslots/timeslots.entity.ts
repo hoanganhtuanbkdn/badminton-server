@@ -57,7 +57,7 @@ export class TimeSlot {
     description: 'Court associated with this time slot',
     type: () => Court,
   })
-  @ManyToOne(() => Court, court => court.timeSlots, { nullable: false })
+  @ManyToOne(() => Court, court => court.timeSlots, { nullable: true })
   @JoinColumn({ name: 'court_id' })
   court: Court;
 
