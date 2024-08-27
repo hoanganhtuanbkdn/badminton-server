@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Owner } from 'src/owners/owners.entity';
 import { Position } from 'src/positions/positions.entity';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
@@ -29,37 +29,55 @@ export class Court {
   address: string;
 
   @ApiProperty({
-    description: 'Geographical coordinates of the court',
+    description: 'Geographical coordinates of the court (nullable)',
     example: '40.7128,-74.0060',
+    required: false,
   })
-  @Column({ name: 'coordinate' })
-  coordinate: string;
+  @Column({ name: 'coordinate', nullable: true })
+  coordinate?: string;
 
   @ApiProperty({
-    description: 'Phone number for contact',
+    description: 'Phone number for contact (nullable)',
     example: '+1234567890',
+    required: false,
   })
-  @Column({ name: 'phone_number' })
-  phoneNumber: string;
+  @Column({ name: 'phone_number', nullable: true })
+  phoneNumber?: string;
 
   @ApiProperty({
-    description: 'Banner image URL for the court',
+    description: 'Banner image URL for the court (nullable)',
     example: 'https://example.com/banner.jpg',
+    required: false,
   })
-  @Column({ name: 'banner' })
-  bannerUrl: string;
+  @Column({ name: 'banner_url', nullable: true })
+  bannerUrl?: string;
 
+  @ApiProperty({
+    description: 'Date when the court was created',
+  })
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
+  @ApiProperty({
+    description: 'Date when the court was last updated',
+    required: false,
+  })
+  @UpdateDateColumn({ name: 'updated_at', nullable: true })
   updatedAt: Date;
+
+  @ApiProperty({
+    description: 'Owner ID of the court',
+    example: 'uuid',
+  })
+  @Column({ name: 'owner_id' })
+  ownerId: string;
 
   @ApiProperty({
     description: 'Owner of the court',
     type: () => Owner,
   })
-  @ManyToOne(() => Owner, owner => owner.courts)
+  @ManyToOne(() => Owner, owner => owner.courts, { nullable: false })
+  @JoinColumn({ name: 'owner_id' })
   owner: Owner;
 
   @ApiProperty({

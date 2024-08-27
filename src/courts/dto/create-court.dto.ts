@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCourtDto {
@@ -19,26 +19,37 @@ export class CreateCourtDto {
   address: string;
 
   @ApiProperty({
-    description: 'Geographical coordinates of the court',
+    description: 'Geographical coordinates of the court (optional)',
     example: '40.7128,-74.0060',
+    required: false,
   })
   @IsString()
-  @IsNotEmpty()
-  coordinate: string;
+  @IsOptional()
+  coordinate?: string;
 
   @ApiProperty({
-    description: 'Phone number for contact',
+    description: 'Phone number for contact (optional)',
     example: '+1234567890',
+    required: false,
   })
   @IsString()
-  @IsNotEmpty()
-  phoneNumber: string;
+  @IsOptional()
+  phoneNumber?: string;
 
   @ApiProperty({
-    description: 'Banner image URL for the court',
+    description: 'Banner image URL for the court (optional)',
     example: 'https://example.com/banner.jpg',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  bannerUrl?: string;
+
+  @ApiProperty({
+    description: 'Owner ID to whom this court belongs',
+    example: 'ownerId',
   })
   @IsString()
   @IsNotEmpty()
-  banner: string;
+  ownerId: string;
 }

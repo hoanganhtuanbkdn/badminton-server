@@ -4,16 +4,30 @@ import { Repository } from 'typeorm';
 import { Court } from './courts.entity';
 import { CreateCourtDto, UpdateCourtDto } from './dto';
 import { GetCourtsDto } from './dto/get-courts.dto';
+import { Owner } from 'src/owners/owners.entity';
 
 @Injectable()
 export class CourtsService {
   constructor(
     @InjectRepository(Court)
     private courtsRepository: Repository<Court>,
+    @InjectRepository(Owner)
+    private ownersRepository: Repository<Owner>,
   ) { }
 
-  create(createCourtDto: CreateCourtDto): Promise<Court> {
-    const court = this.courtsRepository.create(createCourtDto);
+  async create(createCourtDto: CreateCourtDto): Promise<Court> {
+    const { ownerId, ...courtData } = createCourtDto;
+
+    const owner = await this.ownersRepository.findOne({ where: { id: ownerId } });
+    if (!owner) {
+      throw new Error(`Owner with ID ${ownerId} not found`);
+    }
+
+    const court = this.courtsRepository.create({
+      ...courtData,
+      owner, // liên kết với Owner đã tìm thấy
+    });
+
     return this.courtsRepository.save(court);
   }
 
