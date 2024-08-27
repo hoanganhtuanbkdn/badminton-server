@@ -50,7 +50,7 @@ export class TimeSlot {
     description: 'Court ID associated with this time slot',
     example: 'uuid',
   })
-  @Column({ name: 'court_id' })
+  @Column({ name: 'court_id', nullable: true, })
   courtId: string;
 
   @ApiProperty({
