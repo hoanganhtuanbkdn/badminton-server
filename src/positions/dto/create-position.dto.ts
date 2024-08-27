@@ -4,15 +4,15 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreatePositionDto {
   @ApiProperty({
     description: 'Name of the position',
-    example: 'Position A',
+    example: 'Position 1',
   })
   @IsString()
   @IsNotEmpty()
   name: string;
 
   @ApiProperty({
-    description: 'Description of the position',
-    example: 'This is a description for Position A',
+    description: 'Description of the position (optional)',
+    example: 'This is a corner position.',
     required: false,
   })
   @IsString()
@@ -20,7 +20,7 @@ export class CreatePositionDto {
   description?: string;
 
   @ApiProperty({
-    description: 'ID of the court associated with this position',
+    description: 'Court ID associated with the position',
     example: 'courtId',
   })
   @IsString()

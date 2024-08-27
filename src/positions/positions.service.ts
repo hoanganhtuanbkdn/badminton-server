@@ -1,33 +1,77 @@
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CreatePositionDto, UpdatePositionDto } from "./dto";
-import { Position } from "./positions.entity";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Position } from './positions.entity';
+import { CreatePositionDto, UpdatePositionDto, GetPositionsDto } from './dto';
+import { Court } from 'src/courts/courts.entity';
 
+@Injectable()
 export class PositionsService {
   constructor(
     @InjectRepository(Position)
     private positionsRepository: Repository<Position>,
+
+    @InjectRepository(Court)
+    private courtsRepository: Repository<Court>,
+
   ) { }
 
-  create(createPositionDto: CreatePositionDto): Promise<Position> {
-    const position = this.positionsRepository.create(createPositionDto);
+
+  async create(createPositionDto: CreatePositionDto): Promise<Position> {
+    const { courtId, ...positionData } = createPositionDto;
+
+    const court = await this.courtsRepository.findOne({ where: { id: courtId } });
+    if (!court) {
+      throw new NotFoundException(`Court with ID ${courtId} not found`);
+    }
+
+    const position = this.positionsRepository.create({
+      ...positionData,
+      court,
+    });
+
     return this.positionsRepository.save(position);
   }
 
-  findAll(): Promise<Position[]> {
-    return this.positionsRepository.find();
+  async findAll(getPositionsDto: GetPositionsDto): Promise<{ data: Position[]; total: number }> {
+    const { page, limit, sortBy, sortOrder } = getPositionsDto;
+
+    const queryBuilder = this.positionsRepository.createQueryBuilder('position');
+
+    if (sortBy && sortOrder) {
+      queryBuilder.orderBy(`position.${sortBy}`, sortOrder);
+    }
+
+    if (page && limit) {
+      queryBuilder.skip((page - 1) * limit).take(limit);
+    }
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return { data, total };
   }
 
-  findOne(id: string): Promise<Position> {
-    return this.positionsRepository.findOne({ where: { id: id } });
+  async findOne(id: string): Promise<Position> {
+    const position = await this.positionsRepository.findOne({ where: { id } });
+    if (!position) {
+      throw new NotFoundException(`Position with ID ${id} not found`);
+    }
+    return position;
   }
 
   async update(id: string, updatePositionDto: UpdatePositionDto): Promise<Position> {
     await this.positionsRepository.update(id, updatePositionDto);
-    return this.positionsRepository.findOne({ where: { id: id } });
+    const updatedPosition = await this.positionsRepository.findOne({ where: { id } });
+    if (!updatedPosition) {
+      throw new NotFoundException(`Position with ID ${id} not found`);
+    }
+    return updatedPosition;
   }
 
   async remove(id: string): Promise<void> {
-    await this.positionsRepository.delete(id);
+    const result = await this.positionsRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Position with ID ${id} not found`);
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Court } from 'src/courts/courts.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -14,30 +14,34 @@ export class Position {
 
   @ApiProperty({
     description: 'Name of the position',
-    example: 'Position A',
+    example: 'Position 1',
   })
   @Column({ name: 'name' })
   name: string;
 
   @ApiProperty({
-    description: 'Description of the position',
-    example: 'This is a description for Position A',
+    description: 'Description of the position (nullable)',
+    example: 'This is a corner position.',
     required: false,
   })
   @Column({ name: 'description', nullable: true })
-  description: string;
+  description?: string;
+
+  @ApiProperty({
+    description: 'Court ID associated with this position',
+    example: 'uuid',
+  })
+  @Column({ name: 'court_id' })
+  courtId: string;
 
   @ApiProperty({
     description: 'Court associated with this position',
     type: () => Court,
   })
-  @ManyToOne(() => Court, court => court.positions)
+  @ManyToOne(() => Court, court => court.positions, { nullable: false })
+  @JoinColumn({ name: 'court_id' })
   court: Court;
 
-  @ApiProperty({
-    description: 'List of booking details associated with this position',
-    type: () => [BookingDetail],
-  })
   @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.position)
   bookingDetails: BookingDetail[];
 }
