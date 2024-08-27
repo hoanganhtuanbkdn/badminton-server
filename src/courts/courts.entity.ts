@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Owner } from 'src/owners/owners.entity';
 import { Position } from 'src/positions/positions.entity';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
@@ -47,7 +47,13 @@ export class Court {
     example: 'https://example.com/banner.jpg',
   })
   @Column({ name: 'banner' })
-  banner: string;
+  bannerUrl: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
+  updatedAt: Date;
 
   @ApiProperty({
     description: 'Owner of the court',

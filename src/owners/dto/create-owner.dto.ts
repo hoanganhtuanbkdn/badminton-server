@@ -16,5 +16,5 @@ export class CreateOwnerDto {
   @ApiProperty({ description: 'Số điện thoại của chủ' })
   @IsString()
   @IsNotEmpty()
-  phone_number: string;
+  phoneNumber: string;
 }

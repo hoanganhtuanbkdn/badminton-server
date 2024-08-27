@@ -24,7 +24,7 @@ export class CourtsService {
       order: { [sortBy]: sortOrder },
       skip: (page - 1) * limit,
       take: limit,
-      // relations: ['owner'],  // Quan hệ với bảng khác, nếu cần
+      // relations: ['owner'],  
     });
 
     return { data, total, page, limit };
