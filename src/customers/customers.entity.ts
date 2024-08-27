@@ -1,23 +1,49 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Booking } from 'src/bookings/bookings.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('customers')
 export class Customer {
+  @ApiProperty({
+    description: 'Unique identifier for the customer',
+    example: 'uuid',
+  })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @ApiProperty({
+    description: 'Name of the customer',
+    example: 'John Doe',
+  })
+  @Column({ name: 'name' })
   name: string;
 
-  @Column()
-  phone_number: string;
+  @ApiProperty({
+    description: 'Phone number of the customer',
+    example: '+1234567890',
+  })
+  @Column({ name: 'phone_number' })
+  phoneNumber: string;
 
-  @Column()
+  @ApiProperty({
+    description: 'Email address of the customer',
+    example: 'johndoe@example.com',
+  })
+  @Column({ name: 'email' })
   email: string;
 
-  @Column({ nullable: true })
+  @ApiProperty({
+    description: 'Additional notes about the customer',
+    example: 'VIP customer',
+    required: false,
+  })
+  @Column({ name: 'notes', nullable: true })
   notes: string;
 
+  @ApiProperty({
+    description: 'List of bookings made by the customer',
+    type: () => [Booking],
+  })
   @OneToMany(() => Booking, booking => booking.customer)
   bookings: Booking[];
 }

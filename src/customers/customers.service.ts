@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Customer } from './customers.entity';
-import { CreateCustomerDto, UpdateCustomerDto } from './dto';
+import { GetCustomersDto, CreateCustomerDto, UpdateCustomerDto } from './dto';
 
 @Injectable()
 export class CustomersService {
@@ -11,16 +11,24 @@ export class CustomersService {
     private customersRepository: Repository<Customer>,
   ) { }
 
-  create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
+  async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
     const customer = this.customersRepository.create(createCustomerDto);
     return this.customersRepository.save(customer);
   }
 
-  findAll(): Promise<Customer[]> {
-    return this.customersRepository.find();
+  async findAll(getCustomersDto: GetCustomersDto): Promise<{ data: Customer[]; total: number; page: number; limit: number }> {
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = getCustomersDto;
+
+    const [data, total] = await this.customersRepository.findAndCount({
+      order: { [sortBy]: sortOrder },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { data, total, page, limit };
   }
 
-  findOne(id: string): Promise<Customer> {
+  async findOne(id: string): Promise<Customer> {
     return this.customersRepository.findOne({ where: { id } });
   }
 
