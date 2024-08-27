@@ -20,11 +20,11 @@ export class TimeSlotsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all timeslots with pagination, sorting, and filtering' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page', example: 10 })
-  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by', example: 'createdAt' })
-  @ApiQuery({ name: 'sortOrder', required: false, enum: SortOrder, description: 'Sort order', example: SortOrder.DESC })
-  @ApiQuery({ name: 'unitId', required: false, description: 'Filter by unit ID', example: 'unitId' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
+  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: SortOrder, description: 'Sort order' })
+  @ApiQuery({ name: 'unitId', required: false, description: 'Filter by unit ID' })
   @ApiResponse({ status: 200, description: 'Return all timeslots with pagination, sorting, and filtering.', type: [TimeSlot] })
   findAll(@Query() getTimeSlotsDto: GetTimeSlotsDto): Promise<{ data: TimeSlot[]; total: number; page: number; limit: number }> {
     return this.TimeSlotsService.findAll(getTimeSlotsDto);

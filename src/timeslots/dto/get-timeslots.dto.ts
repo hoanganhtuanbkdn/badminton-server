@@ -7,27 +7,27 @@ export enum SortOrder {
 }
 
 export class GetTimeSlotsDto {
-  @ApiPropertyOptional({ description: 'Page number', example: 1 })
+  @ApiPropertyOptional({ description: 'Page number' })
   @IsOptional()
   @IsNumber()
-  page?: number = 1;
+  page?: number;
 
-  @ApiPropertyOptional({ description: 'Number of items per page', example: 10 })
+  @ApiPropertyOptional({ description: 'Number of items per page' })
   @IsOptional()
   @IsNumber()
-  limit?: number = 10;
+  limit?: number;
 
-  @ApiPropertyOptional({ description: 'Field to sort by', example: 'startTime' })
+  @ApiPropertyOptional({ description: 'Field to sort by' })
   @IsOptional()
   @IsString()
   sortBy?: string = 'startTime';
 
-  @ApiPropertyOptional({ description: 'Sort order', enum: SortOrder, example: SortOrder.DESC })
+  @ApiPropertyOptional({ description: 'Sort order', enum: SortOrder })
   @IsOptional()
   @IsEnum(SortOrder)
   sortOrder?: SortOrder = SortOrder.DESC;
 
-  @ApiPropertyOptional({ description: 'Filter by unit ID', example: 'unitId' })
+  @ApiPropertyOptional({ description: 'Filter by unit ID' })
   @IsOptional()
   @IsString()
   unitId?: string;

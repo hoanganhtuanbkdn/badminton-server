@@ -19,7 +19,7 @@ export class TimeSlotsService {
 
   // Get all timeslots with pagination, sorting, and filtering
   async findAll(getTimeSlotsDto: GetTimeSlotsDto): Promise<{ data: TimeSlot[]; total: number; page: number; limit: number }> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC', unitId } = getTimeSlotsDto;
+    const { page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'DESC', unitId } = getTimeSlotsDto;
 
     const where: any = {};
     if (unitId) where.unitId = unitId;
