@@ -40,14 +40,14 @@ export class Owner {
     description: 'Name of the account holder receiving the payment',
     example: 'John Doe',
   })
-  @Column()
+  @Column({ nullable: true })
   accountHolder: string;
 
   @ApiProperty({
     description: 'Name of the bank where the account is held',
     example: 'Bank of America',
   })
-  @Column()
+  @Column({ nullable: true })
   bankName: string;
 
   @ApiProperty({
