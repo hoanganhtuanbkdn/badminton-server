@@ -26,14 +26,14 @@ export class Owner {
     description: 'Email address of the owner',
     example: 'owner@example.com',
   })
-  @Column({ name: 'email' })
+  @Column({ name: 'email', nullable: true })
   email: string;
 
   @ApiProperty({
     description: 'Phone number of the owner',
     example: '+1234567890',
   })
-  @Column({ name: 'phone_number' })
+  @Column({ name: 'phone_number', nullable: true })
   phoneNumber: string;
 
   @ApiProperty({
@@ -54,7 +54,7 @@ export class Owner {
     description: 'Bank account number',
     example: '1234567890',
   })
-  @Column()
+  @Column({ nullable: true })
   accountNumber: string;
 
   @ApiProperty({
