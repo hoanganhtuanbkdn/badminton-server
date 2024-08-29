@@ -11,14 +11,6 @@ export class CreateTimeSlotDto {
   startTime: string;
 
   @ApiProperty({
-    description: 'End time of the time slot in HH:mm format',
-    example: '09:30',
-  })
-  @IsString()
-  @IsNotEmpty()
-  endTime: string;
-
-  @ApiProperty({
     description: 'Duration of the time slot',
     example: 1,
   })
@@ -52,6 +44,5 @@ export class CreateTimeSlotDto {
     example: 'Ca Sáng',
   })
   @IsString()
-  @IsNotEmpty()
   name: string;
 }
