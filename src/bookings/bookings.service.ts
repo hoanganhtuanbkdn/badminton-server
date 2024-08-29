@@ -55,21 +55,32 @@ export class BookingsService {
   }
 
   // Get all bookings with pagination, sorting, and filtering
-  async findAll(getBookingsDto: GetBookingsDto): Promise<{ data: Booking[]; total: number; page: number; limit: number }> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC', customerId, courtId } = getBookingsDto;
+  async findAll(getBookingsDto: GetBookingsDto): Promise<{ data: Booking[]; total: number; page?: number; limit?: number }> {
+    const { page, limit, sortBy = 'createdAt', sortOrder = 'DESC', customerId, courtId } = getBookingsDto;
 
     const where: any = {};
     if (customerId) where.customerId = customerId;
     if (courtId) where.courtId = courtId;
 
-    const [data, total] = await this.bookingsRepository.findAndCount({
-      where,
-      order: { [sortBy]: sortOrder },
-      skip: (page - 1) * limit,
-      take: limit,
-      relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+    let data: Booking[];
+    let total: number;
 
-    });
+    if (page && limit) {
+      [data, total] = await this.bookingsRepository.findAndCount({
+        where,
+        order: { [sortBy]: sortOrder },
+        skip: (page - 1) * limit,
+        take: limit,
+        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+      });
+    } else {
+      data = await this.bookingsRepository.find({
+        where,
+        order: { [sortBy]: sortOrder },
+        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+      });
+      total = data.length;
+    }
 
     return { data, total, page, limit };
   }

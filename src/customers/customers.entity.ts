@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Booking } from 'src/bookings/bookings.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Court } from 'src/courts/courts.entity';
@@ -49,12 +49,17 @@ export class Customer {
   @JoinColumn({ name: 'booking_id' })
   booking: Booking;
 
-
   @ApiProperty({
     description: 'Booking ID associated with this customer',
     example: 'uuid',
   })
   @Column({ type: 'uuid', name: 'booking_id', nullable: true })
   bookingId: string;
+
+  @CreateDateColumn({ name: 'created_at', nullable: true, })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
+  updatedAt: Date;
 }
 

@@ -20,14 +20,14 @@ export class BookingsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all bookings with pagination, sorting, and filtering' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page', example: 10 })
-  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by', example: 'createdAt' })
-  @ApiQuery({ name: 'sortOrder', required: false, enum: SortOrder, description: 'Sort order', example: SortOrder.DESC })
-  @ApiQuery({ name: 'customerId', required: false, description: 'Filter by customer ID', example: 'customerId' })
-  @ApiQuery({ name: 'courtId', required: false, description: 'Filter by court ID', example: 'courtId' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
+  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: SortOrder, description: 'Sort order' })
+  @ApiQuery({ name: 'customerId', required: false, description: 'Filter by customer ID' })
+  @ApiQuery({ name: 'courtId', required: false, description: 'Filter by court ID' })
   @ApiResponse({ status: 200, description: 'Return all bookings with pagination, sorting, and filtering.', type: [Booking] })
-  findAll(@Query() getBookingsDto: GetBookingsDto): Promise<{ data: Booking[]; total: number; page: number; limit: number }> {
+  findAll(@Query() getBookingsDto: any): Promise<{ data: Booking[]; total: number; page?: number; limit?: number }> {
     return this.bookingsService.findAll(getBookingsDto);
   }
 

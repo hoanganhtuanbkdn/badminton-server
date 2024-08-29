@@ -16,14 +16,21 @@ export class CustomersService {
     return this.customersRepository.save(customer);
   }
 
-  async findAll(getCustomersDto: GetCustomersDto): Promise<{ data: Customer[]; total: number; page: number; limit: number }> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = getCustomersDto;
+  async findAll(getCustomersDto: GetCustomersDto): Promise<{ data: Customer[]; total: number; page?: number; limit?: number }> {
+    const { page, limit, sortBy, sortOrder } = getCustomersDto;
 
-    const [data, total] = await this.customersRepository.findAndCount({
-      order: { [sortBy]: sortOrder },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const queryOptions: any = {};
+
+    if (page && limit) {
+      queryOptions.skip = (page - 1) * limit;
+      queryOptions.take = limit;
+    }
+
+    if (sortBy && sortOrder) {
+      queryOptions.order = { [sortBy]: sortOrder };
+    }
+
+    const [data, total] = await this.customersRepository.findAndCount(queryOptions);
 
     return { data, total, page, limit };
   }

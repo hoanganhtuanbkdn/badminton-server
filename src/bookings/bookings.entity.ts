@@ -72,7 +72,6 @@ export class Booking {
     type: () => Customer,
   })
   @OneToOne(() => Customer, customer => customer.booking)
-  @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
   @ApiProperty({
@@ -81,7 +80,6 @@ export class Booking {
   })
   @Column({ type: 'uuid', name: 'court_id', nullable: true })
   courtId: string;
-
 
   @ApiProperty({
     description: 'Court associated with the booking',

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto, UpdateCustomerDto, GetCustomersDto } from './dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody, getSchemaPath } from '@nestjs/swagger';
 import { Customer } from './customers.entity';
 
 @ApiTags('customers')
@@ -19,11 +19,23 @@ export class CustomersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all customers with pagination and sorting' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page', example: 10 })
-  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by', example: 'createdAt' })
-  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order', example: 'DESC' })
-  @ApiResponse({ status: 200, description: 'Return all customers with pagination and sorting.', type: [Customer] })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
+  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all customers with pagination and sorting.',
+    schema: {
+      type: 'object',
+      properties: {
+        data: { type: 'array', items: { $ref: getSchemaPath(Customer) } },
+        total: { type: 'number' },
+        page: { type: 'number', nullable: true },
+        limit: { type: 'number', nullable: true },
+      },
+    },
+  })
   findAll(@Query() getCustomersDto: GetCustomersDto) {
     return this.customersService.findAll(getCustomersDto);
   }

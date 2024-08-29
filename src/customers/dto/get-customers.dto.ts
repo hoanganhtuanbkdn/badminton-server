@@ -8,24 +8,24 @@ export enum SortOrder {
 }
 
 export class GetCustomersDto {
-  @ApiPropertyOptional({ description: 'Page number', example: 1 })
+  @ApiPropertyOptional({ description: 'Page number' })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  page?: number = 1;
+  page?: number;
 
-  @ApiPropertyOptional({ description: 'Number of items per page', example: 10 })
+  @ApiPropertyOptional({ description: 'Number of items per page' })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  limit?: number = 10;
+  limit?: number;
 
-  @ApiPropertyOptional({ description: 'Field to sort by', example: 'createdAt' })
+  @ApiPropertyOptional({ description: 'Field to sort by' })
   @IsOptional()
   @IsString()
   sortBy?: string = 'createdAt';
 
-  @ApiPropertyOptional({ description: 'Sort order', enum: SortOrder, example: SortOrder.DESC })
+  @ApiPropertyOptional({ description: 'Sort order', enum: SortOrder, })
   @IsOptional()
   @IsEnum(SortOrder)
   sortOrder?: SortOrder = SortOrder.DESC;
