@@ -14,9 +14,8 @@ export class TimeSlot {
 
   @ApiProperty({
     description: 'Name of the time slot',
-    example: 'Ca Sang',
   })
-  @Column({ name: 'name' })
+  @Column({ name: 'name', nullable: true, })
   name: string;
 
   @ApiProperty({
@@ -30,14 +29,18 @@ export class TimeSlot {
     description: 'End time of the time slot in HH:mm format',
     example: '09:30',
   })
-  @Column({ name: 'end_time' })
+  @Column({ name: 'end_time', nullable: true, })
   endTime: string;
 
   @ApiProperty({
     description: 'duration',
     example: 1,
   })
-  @Column({ name: 'duration' })
+  @Column({
+    type: 'decimal',
+    precision: 3, // Tổng số chữ số
+    scale: 1, // Số chữ số sau dấu thập phân
+  })
   duration: number;
 
   @ApiProperty({

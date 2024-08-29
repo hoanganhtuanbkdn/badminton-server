@@ -38,12 +38,46 @@ export class BookingDetail {
     description: 'Duration of the booking in hours',
     example: 1.5,
   })
-  @Column('decimal')
+  @Column({
+    type: 'decimal',
+    precision: 3, // Tổng số chữ số
+    scale: 1, // Số chữ số sau dấu thập phân
+  })
   duration: number;
+
+  @ApiProperty({
+    description: 'bookingType: WALK_IN, FIXED',
+    example: "WALK_IN",
+  })
+  @Column({
+    name: 'booking_type',
+  })
+  bookingType?: string;
+
+  @ApiProperty({
+    description: 'bookingDay: 0, 1, 2, 3, 4, 5, 6',
+    example: "0",
+  })
+  @Column({
+    name: 'booking_day',
+    nullable: true,
+  })
+  bookingDay?: string;
+
+  @ApiProperty({
+    description: 'bookingMonth: 5',
+    example: "5",
+    nullable: true,
+  })
+  @Column({
+    name: 'booking_month',
+  })
+  bookingMonth?: string;
 
   @ApiProperty({
     description: 'The date when the court is booked',
     example: '2024-08-28',
+    nullable: true,
   })
   @Column('date')
   bookingDate: string;
