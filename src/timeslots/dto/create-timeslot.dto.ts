@@ -19,6 +19,13 @@ export class CreateTimeSlotDto {
   endTime: string;
 
   @ApiProperty({
+    description: 'Duration of the time slot',
+    example: 1,
+  })
+  @IsNotEmpty()
+  duration: number;
+
+  @ApiProperty({
     description: 'Fixed fee for booking during this time slot',
     example: 100000,
   })
@@ -39,4 +46,12 @@ export class CreateTimeSlotDto {
   @IsString()
   @IsNotEmpty()
   courtId: string;
+
+  @ApiProperty({
+    description: 'Name of the time slot',
+    example: 'Ca Sáng',
+  })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 }
