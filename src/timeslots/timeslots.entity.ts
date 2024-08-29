@@ -13,6 +13,13 @@ export class TimeSlot {
   id: string;
 
   @ApiProperty({
+    description: 'Name of the time slot',
+    example: 'Ca Sang',
+  })
+  @Column({ name: 'name' })
+  name: string;
+
+  @ApiProperty({
     description: 'Start time of the time slot in HH:mm format',
     example: '08:00',
   })
@@ -25,6 +32,13 @@ export class TimeSlot {
   })
   @Column({ name: 'end_time' })
   endTime: string;
+
+  @ApiProperty({
+    description: 'duration',
+    example: 1,
+  })
+  @Column({ name: 'duration' })
+  duration: number;
 
   @ApiProperty({
     description: 'Fixed fee for booking during this time slot',
@@ -50,7 +64,7 @@ export class TimeSlot {
     description: 'Court ID associated with this time slot',
     example: 'uuid',
   })
-  @Column({ name: 'court_id', nullable: true, })
+  @Column({ name: 'court_id' })
   courtId: string;
 
   @ApiProperty({
