@@ -6,8 +6,6 @@ export class CreateBookingDetailDto {
     description: 'ID of the booking associated with this detail',
     example: 'bookingId',
   })
-  @IsString()
-  @IsNotEmpty()
   bookingId: string;
 
   @ApiProperty({
@@ -34,9 +32,11 @@ export class CreateBookingDetailDto {
   duration: number;
 
   @ApiProperty({
-    description: 'bookingType: WALK_IN, FIXED',
+    description: 'bookingType: WALK_IN, SCHEDULED',
     example: "WALK_IN",
   })
+  @IsString()
+  @IsNotEmpty()
   bookingType?: string;
 
   @ApiProperty({
@@ -48,14 +48,12 @@ export class CreateBookingDetailDto {
   @ApiProperty({
     description: 'bookingMonth: 5',
     example: "5",
-    nullable: true,
   })
   bookingMonth?: string;
 
   @ApiProperty({
     description: 'The date when the court is booked',
     example: '2024-08-28',
-    nullable: true,
   })
-  bookingDate: string;
+  bookingDate?: string;
 }

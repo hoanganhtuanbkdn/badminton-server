@@ -14,7 +14,7 @@ export class BookingsController {
   @ApiBody({ type: CreateBookingDto })
   @ApiResponse({ status: 201, description: 'The booking has been successfully created.', type: Booking })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  create(@Body() createBookingDto: CreateBookingDto): Promise<Booking> {
+  create(@Body() createBookingDto: any): Promise<Booking> {
     return this.bookingsService.create(createBookingDto);
   }
 

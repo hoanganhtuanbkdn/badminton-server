@@ -1,9 +1,15 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, OneToOne } from 'typeorm';
 import { Customer } from 'src/customers/customers.entity';
 import { Court } from 'src/courts/courts.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { Payment } from 'src/payments/payments.entity';
 import { ApiProperty } from '@nestjs/swagger';
+
+export enum BookingMode {
+  BOOK_COURT = 'BOOK_COURT',  // Đặt sân
+  JOIN_COURT = 'JOIN_COURT',  // Ghép sân
+}
+
 
 @Entity('bookings')
 export class Booking {
@@ -13,20 +19,6 @@ export class Booking {
   })
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @ApiProperty({
-    description: 'Customer associated with the booking',
-    type: () => Customer,
-  })
-  @ManyToOne(() => Customer, customer => customer.bookings)
-  customer: Customer;
-
-  @ApiProperty({
-    description: 'Court associated with the booking',
-    type: () => Court,
-  })
-  @ManyToOne(() => Court, court => court.bookings)
-  court: Court;
 
   @ApiProperty({
     description: 'Voucher code applied to the booking, if any',
@@ -59,17 +51,45 @@ export class Booking {
   additionalNotes: string;
 
   @ApiProperty({
-    description: 'Type of booking (e.g., Scheduled, Flexible)',
-    example: 'Scheduled',
+    description: 'Booking mode (e.g., BOOK_COURT, JOIN_COURT)',
+    example: BookingMode.BOOK_COURT,
   })
-  @Column({ name: 'booking_type' })
-  bookingType: string;
+  @Column({
+    type: 'enum',
+    enum: BookingMode,
+    nullable: true
+  })
+  bookingMode: BookingMode;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
   updatedAt: Date;
+
+  @ApiProperty({
+    description: 'Customer associated with the booking',
+    type: () => Customer,
+  })
+  @OneToOne(() => Customer, customer => customer.booking)
+  @JoinColumn({ name: 'customer_id' })
+  customer: Customer;
+
+  @ApiProperty({
+    description: 'Unique identifier for the court',
+    example: 'uuid',
+  })
+  @Column({ type: 'uuid', name: 'court_id', nullable: true })
+  courtId: string;
+
+
+  @ApiProperty({
+    description: 'Court associated with the booking',
+    type: () => Court,
+  })
+  @ManyToOne(() => Court, court => court.bookings)
+  @JoinColumn({ name: 'court_id' })  // This is optional, but it helps if you want to customize the column name
+  court: Court;
 
   @ApiProperty({
     description: 'List of booking details associated with this booking',

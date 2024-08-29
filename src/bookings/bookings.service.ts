@@ -3,18 +3,55 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Booking } from './bookings.entity';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto } from './dto';
+import { BookingDetail } from 'src/booking-details/booking-details.entity';
+import { Customer } from 'src/customers/customers.entity';
 
 @Injectable()
 export class BookingsService {
   constructor(
     @InjectRepository(Booking)
     private bookingsRepository: Repository<Booking>,
+    @InjectRepository(Customer)
+    private readonly customersRepository: Repository<Customer>,
+
+    @InjectRepository(BookingDetail)
+    private readonly bookingDetailsRepository: Repository<BookingDetail>,
   ) { }
 
   // Create a new booking
-  async create(createBookingDto: CreateBookingDto): Promise<Booking> {
-    const booking = this.bookingsRepository.create(createBookingDto);
-    return this.bookingsRepository.save(booking);
+  async create(createBookingDto: any): Promise<Booking> {
+    const { customer, bookingDetails, ...bookingData } = createBookingDto;
+
+    console.log(111, customer, bookingDetails, bookingData);
+    // Create the booking entity
+    const booking = this.bookingsRepository.create({
+      ...bookingData,
+    });
+
+    // Save the booking to get the ID
+    const savedBooking: any = await this.bookingsRepository.save(booking);
+
+    if (customer) {
+      const customerEntity = this.customersRepository.create({ ...customer, bookingId: savedBooking.id });
+      await this.customersRepository.save(customerEntity);
+    }
+
+    // Save booking details if provided
+    if (bookingDetails && bookingDetails.length > 0) {
+      const bookingDetailsEntities = bookingDetails.map(detail => {
+        return this.bookingDetailsRepository.create({
+          ...detail,
+          bookingId: savedBooking.id,
+        });
+      });
+      await this.bookingDetailsRepository.save(bookingDetailsEntities);
+    }
+
+    // Return the fully populated booking entity
+    return this.bookingsRepository.findOne({
+      where: { id: savedBooking.id },
+      relations: ['customer', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+    });
   }
 
   // Get all bookings with pagination, sorting, and filtering
@@ -30,6 +67,8 @@ export class BookingsService {
       order: { [sortBy]: sortOrder },
       skip: (page - 1) * limit,
       take: limit,
+      relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+
     });
 
     return { data, total, page, limit };
@@ -37,7 +76,10 @@ export class BookingsService {
 
   // Get a booking by ID
   async findOne(id: string): Promise<Booking> {
-    const booking = await this.bookingsRepository.findOne({ where: { id } });
+    const booking = await this.bookingsRepository.findOne({
+      where: { id },
+      relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+    });
     if (!booking) {
       throw new NotFoundException(`Booking with ID "${id}" not found`);
     }

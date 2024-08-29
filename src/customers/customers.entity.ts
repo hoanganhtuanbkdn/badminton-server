@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
 import { Booking } from 'src/bookings/bookings.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Court } from 'src/courts/courts.entity';
 
 @Entity('customers')
 export class Customer {
@@ -41,9 +42,19 @@ export class Customer {
   notes: string;
 
   @ApiProperty({
-    description: 'List of bookings made by the customer',
-    type: () => [Booking],
+    description: 'Booking associated with this customer',
+    type: () => Booking,
   })
-  @OneToMany(() => Booking, booking => booking.customer)
-  bookings: Booking[];
+  @OneToOne(() => Booking, booking => booking.customer, { cascade: true })
+  @JoinColumn({ name: 'booking_id' })
+  booking: Booking;
+
+
+  @ApiProperty({
+    description: 'Booking ID associated with this customer',
+    example: 'uuid',
+  })
+  @Column({ type: 'uuid', name: 'booking_id', nullable: true })
+  bookingId: string;
 }
+

@@ -1,8 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Booking } from 'src/bookings/bookings.entity';
 import { Position } from 'src/positions/positions.entity';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { ApiProperty } from '@nestjs/swagger';
+
+export enum BookingType {
+  WALK_IN = 'WALK_IN', // Vãng lai
+  SCHEDULED = 'SCHEDULED', // Cố định
+}
 
 @Entity('booking-details')
 export class BookingDetail {
@@ -18,7 +23,15 @@ export class BookingDetail {
     type: () => Booking,
   })
   @ManyToOne(() => Booking, booking => booking.bookingDetails)
+  @JoinColumn({ name: 'booking_id' }) // Thêm JoinColumn để liên kết với bookingId
   booking: Booking;
+
+  @ApiProperty({
+    description: 'Booking ID for this detail',
+    example: 'uuid',
+  })
+  @Column({ name: 'booking_id' })
+  bookingId: string;
 
   @ApiProperty({
     description: 'Position associated with this detail',
@@ -46,8 +59,8 @@ export class BookingDetail {
   duration: number;
 
   @ApiProperty({
-    description: 'bookingType: WALK_IN, FIXED',
-    example: "WALK_IN",
+    description: 'Type of booking: WALK_IN, SCHEDULED',
+    example: BookingType.SCHEDULED,
   })
   @Column({
     name: 'booking_type',
@@ -79,6 +92,6 @@ export class BookingDetail {
     example: '2024-08-28',
     nullable: true,
   })
-  @Column('date')
+  @Column({ name: "booking_date" })
   bookingDate: string;
 }
