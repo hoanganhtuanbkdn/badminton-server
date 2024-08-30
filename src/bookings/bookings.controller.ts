@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from 
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto, SortOrder } from './dto';
 import { Booking } from './bookings.entity';
+import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
 
 @ApiTags('bookings')
 @Controller('bookings')
@@ -16,6 +17,15 @@ export class BookingsController {
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   create(@Body() createBookingDto: any): Promise<Booking> {
     return this.bookingsService.create(createBookingDto);
+  }
+
+  @Post('/multiple')
+  @ApiOperation({ summary: 'Create multiple bookings' })
+  @ApiBody({ type: CreateMultipleBookingsDto })
+  @ApiResponse({ status: 201, description: 'The bookings have been successfully created.', type: [Booking] })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  createMultiple(@Body() createMultipleBookingsDto: any): Promise<Booking[]> {
+    return this.bookingsService.createMultiple(createMultipleBookingsDto);
   }
 
   @Get()

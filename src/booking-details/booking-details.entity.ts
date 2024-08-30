@@ -1,8 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Booking } from 'src/bookings/bookings.entity';
 import { Position } from 'src/positions/positions.entity';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Owner } from 'src/owners/owners.entity';
+import { Court } from 'src/courts/courts.entity';
 
 export enum BookingType {
   WALK_IN = 'WALK_IN', // Vãng lai
@@ -23,7 +25,7 @@ export class BookingDetail {
     type: () => Booking,
   })
   @ManyToOne(() => Booking, booking => booking.bookingDetails)
-  @JoinColumn({ name: 'booking_id' }) // Thêm JoinColumn để liên kết với bookingId
+  @JoinColumn({ name: 'booking_id' })
   booking: Booking;
 
   @ApiProperty({
@@ -34,18 +36,64 @@ export class BookingDetail {
   bookingId: string;
 
   @ApiProperty({
+    description: 'Court associated with this detail',
+    type: () => Court,
+  })
+  @ManyToOne(() => Court, court => court.bookingDetails)
+  @JoinColumn({ name: 'court_id' }) // Join column for courtId
+  court: Court;
+
+  @ApiProperty({
+    description: 'Court ID for this detail',
+    example: 'uuid',
+  })
+  @Column({ name: 'court_id' })
+  courtId: string;
+
+  @ApiProperty({
     description: 'Position associated with this detail',
     type: () => Position,
   })
   @ManyToOne(() => Position, position => position.bookingDetails)
+  @JoinColumn({ name: 'position_id' }) // Join column for positionId
   position: Position;
+
+  @ApiProperty({
+    description: 'Position ID for this detail',
+    example: 'uuid',
+  })
+  @Column({ name: 'position_id' })
+  positionId: string;
+
+  @ApiProperty({
+    description: 'Owner associated with this detail',
+    type: () => Owner,
+  })
+  @ManyToOne(() => Owner, owner => owner.bookingDetails)
+  @JoinColumn({ name: 'owner_id' }) // Join column for ownerId
+  owner: Owner;
+
+  @ApiProperty({
+    description: 'Owner ID for this detail',
+    example: 'uuid',
+  })
+  @Column({ name: 'owner_id' })
+  ownerId: string;
 
   @ApiProperty({
     description: 'Time slot associated with this detail',
     type: () => TimeSlot,
   })
   @ManyToOne(() => TimeSlot, timeSlot => timeSlot.bookingDetails)
+  @JoinColumn({ name: 'time_slot_id' }) // Join column for timeSlotId
   timeSlot: TimeSlot;
+
+  @ApiProperty({
+    description: 'Time slot ID for this detail',
+    example: 'uuid',
+  })
+  @Column({ name: 'time_slot_id' })
+  timeSlotId: string;
 
   @ApiProperty({
     description: 'Duration of the booking in hours',
@@ -94,4 +142,10 @@ export class BookingDetail {
   })
   @Column({ name: "booking_date" })
   bookingDate: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
+  updatedAt: Date;
 }

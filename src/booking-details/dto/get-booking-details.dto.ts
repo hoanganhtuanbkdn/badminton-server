@@ -29,4 +29,16 @@ export class GetBookingDetailsDto {
   @IsOptional()
   @IsEnum(SortOrder)
   sortOrder?: SortOrder;
+
+  @IsOptional()
+  @IsString()
+  courtId?: string;
+
+  @IsOptional()
+  @IsString()
+  positionId?: string;
+
+  @IsOptional()
+  @IsString()
+  ownerId?: string;
 }

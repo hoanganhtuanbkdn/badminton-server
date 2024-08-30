@@ -16,17 +16,34 @@ export class BookingDetailsService {
     return this.bookingDetailsRepository.save(bookingDetail);
   }
 
-  async findAll(getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number }> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = getBookingDetailsDto;
+  async findAll(getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC', courtId, positionId, ownerId } = getBookingDetailsDto;
 
-    const [data, total] = await this.bookingDetailsRepository.findAndCount({
-      relations: ['booking', 'position', 'timeSlot'],
-      order: { [sortBy]: sortOrder },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
+      .leftJoinAndSelect('bookingDetail.booking', 'booking')
+      .leftJoinAndSelect('bookingDetail.position', 'position')
+      .leftJoinAndSelect('bookingDetail.timeSlot', 'timeSlot')
+      .leftJoinAndSelect('bookingDetail.court', 'court') // Thêm join cho court nếu cần thiết
+      .leftJoinAndSelect('bookingDetail.owner', 'owner') // Thêm join cho owner nếu cần thiết
+      .orderBy(`bookingDetail.${sortBy}`, sortOrder)
+      .skip((page - 1) * limit)
+      .take(limit);
 
-    return { data, total };
+    if (courtId) {
+      queryBuilder.andWhere('bookingDetail.courtId = :courtId', { courtId });
+    }
+
+    if (positionId) {
+      queryBuilder.andWhere('bookingDetail.positionId = :positionId', { positionId });
+    }
+
+    if (ownerId) {
+      queryBuilder.andWhere('bookingDetail.ownerId = :ownerId', { ownerId });
+    }
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<BookingDetail> {

@@ -5,6 +5,7 @@ import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Booking } from 'src/bookings/bookings.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { slugify } from 'src/shared/utils';
+import { BookingDetail } from 'src/booking-details/booking-details.entity';
 
 @Entity('courts')
 export class Court {
@@ -55,6 +56,9 @@ export class Court {
   })
   @Column({ name: 'banner_url', nullable: true })
   bannerUrl?: string;
+
+  @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.court)
+  bookingDetails: BookingDetail[];
 
   @ApiProperty({
     description: 'Date when the court was created',

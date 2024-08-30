@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, Up
 import { Court } from 'src/courts/courts.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { slugify } from 'src/shared/utils';
+import { BookingDetail } from 'src/booking-details/booking-details.entity';
 
 @Entity('owners')
 export class Owner {
@@ -63,6 +64,9 @@ export class Owner {
   })
   @OneToMany(() => Court, court => court.owner)
   courts: Court[];
+
+  @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.owner)
+  bookingDetails: BookingDetail[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBookingDetailDto {
@@ -56,4 +56,20 @@ export class CreateBookingDetailDto {
     example: '2024-08-28',
   })
   bookingDate?: string;
+
+  @ApiProperty({
+    description: 'ID của sân liên kết với chi tiết này',
+    example: 'courtId',
+  })
+  @IsString()
+  @IsNotEmpty()
+  courtId: string;
+
+  @ApiProperty({
+    description: 'ID của chủ sân liên kết với chi tiết này',
+    example: 'ownerId',
+  })
+  @IsString()
+  @IsOptional()
+  ownerId?: string;
 }

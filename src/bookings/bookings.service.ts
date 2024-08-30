@@ -5,6 +5,7 @@ import { Booking } from './bookings.entity';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto } from './dto';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { Customer } from 'src/customers/customers.entity';
+import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
 
 @Injectable()
 export class BookingsService {
@@ -18,11 +19,20 @@ export class BookingsService {
     private readonly bookingDetailsRepository: Repository<BookingDetail>,
   ) { }
 
+  async createMultiple(createMultipleBookingsDto: any): Promise<Booking[]> {
+    const bookings = await Promise.all(
+      createMultipleBookingsDto.bookings.map(createBookingDto =>
+        this.create(createBookingDto),
+      ),
+    );
+    return bookings;
+  }
+
   // Create a new booking
   async create(createBookingDto: any): Promise<Booking> {
     const { customer, bookingDetails, ...bookingData } = createBookingDto;
 
-    console.log(111, customer, bookingDetails, bookingData);
+    // console.log(111, customer, bookingDetails, bookingData);
     // Create the booking entity
     const booking = this.bookingsRepository.create({
       ...bookingData,

@@ -23,8 +23,11 @@ export class BookingDetailsController {
   @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
   @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
+  @ApiQuery({ name: 'courtId', required: false, description: 'Filter by court ID' })
+  @ApiQuery({ name: 'positionId', required: false, description: 'Filter by position ID' })
+  @ApiQuery({ name: 'ownerId', required: false, description: 'Filter by owner ID' })
   @ApiResponse({ status: 200, description: 'Return all booking details with pagination and sorting.', type: [BookingDetail] })
-  findAll(@Query() getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number }> {
+  findAll(@Query() getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
     return this.bookingDetailsService.findAll(getBookingDetailsDto);
   }
 
