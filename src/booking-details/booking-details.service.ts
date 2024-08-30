@@ -23,8 +23,10 @@ export class BookingDetailsService {
       .leftJoinAndSelect('bookingDetail.booking', 'booking')
       .leftJoinAndSelect('bookingDetail.position', 'position')
       .leftJoinAndSelect('bookingDetail.timeSlot', 'timeSlot')
-      .leftJoinAndSelect('bookingDetail.court', 'court') // Thêm join cho court nếu cần thiết
-      .leftJoinAndSelect('bookingDetail.owner', 'owner') // Thêm join cho owner nếu cần thiết
+      .leftJoinAndSelect('bookingDetail.court', 'court')
+      .leftJoinAndSelect('bookingDetail.owner', 'owner')
+      .leftJoinAndSelect('booking.customer', 'customer')
+      .leftJoinAndSelect('booking.payments', 'payments')
       .orderBy(`bookingDetail.${sortBy}`, sortOrder)
       .skip((page - 1) * limit)
       .take(limit);
