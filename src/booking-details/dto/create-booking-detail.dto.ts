@@ -3,12 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBookingDetailDto {
   @ApiProperty({
-    description: 'ID of the booking associated with this detail',
-    example: 'bookingId',
-  })
-  bookingId: string;
-
-  @ApiProperty({
     description: 'ID of the position associated with this detail',
     example: 'positionId',
   })

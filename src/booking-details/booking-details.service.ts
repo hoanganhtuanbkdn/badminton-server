@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BookingDetail } from './booking-details.entity';
-import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto } from './dto';
+import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
 
 @Injectable()
 export class BookingDetailsService {
@@ -17,7 +17,7 @@ export class BookingDetailsService {
   }
 
   async findAll(getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC', courtId, positionId, ownerId } = getBookingDetailsDto;
+    const { page = 1, limit = 10, sortBy = SortByFields.CREATED_AT, sortOrder = SortOrder.DESC, courtId, positionId, ownerId, paymentStatus, customerName } = getBookingDetailsDto;
 
     const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
       .leftJoinAndSelect('bookingDetail.booking', 'booking')
@@ -41,6 +41,14 @@ export class BookingDetailsService {
 
     if (ownerId) {
       queryBuilder.andWhere('bookingDetail.ownerId = :ownerId', { ownerId });
+    }
+
+    if (paymentStatus) {
+      queryBuilder.andWhere('booking.paymentStatus = :paymentStatus', { paymentStatus });
+    }
+
+    if (customerName) {
+      queryBuilder.andWhere('customer.name LIKE :customerName', { customerName: `%${customerName}%` });
     }
 
     const [data, total] = await queryBuilder.getManyAndCount();

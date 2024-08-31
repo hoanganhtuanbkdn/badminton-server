@@ -45,7 +45,7 @@ export class Customer {
     description: 'Booking associated with this customer',
     type: () => Booking,
   })
-  @OneToOne(() => Booking, booking => booking.customer, { cascade: true })
+  @OneToOne(() => Booking, booking => booking.customer)
   @JoinColumn({ name: 'booking_id' })
   booking: Booking;
 
