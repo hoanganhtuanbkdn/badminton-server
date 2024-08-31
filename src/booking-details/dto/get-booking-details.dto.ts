@@ -59,4 +59,14 @@ export class GetBookingDetailsDto {
   @IsOptional()
   @IsString()
   customerName?: string;
+
+  @ApiPropertyOptional({ description: 'Start date for filtering by bookingDate', example: '2024-08-01' })
+  @IsOptional()
+  @IsString()
+  startDate?: string;
+
+  @ApiPropertyOptional({ description: 'End date for filtering by bookingDate', example: '2024-08-31' })
+  @IsOptional()
+  @IsString()
+  endDate?: string;
 }

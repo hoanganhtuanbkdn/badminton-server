@@ -17,7 +17,7 @@ export class BookingDetailsService {
   }
 
   async findAll(getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
-    const { page = 1, limit = 10, sortBy = SortByFields.CREATED_AT, sortOrder = SortOrder.DESC, courtId, positionId, ownerId, paymentStatus, customerName } = getBookingDetailsDto;
+    const { page = 1, limit = 10, sortBy = SortByFields.CREATED_AT, sortOrder = SortOrder.DESC, courtId, positionId, ownerId, paymentStatus, customerName, startDate, endDate } = getBookingDetailsDto;
 
     const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
       .leftJoinAndSelect('bookingDetail.booking', 'booking')
@@ -51,11 +51,18 @@ export class BookingDetailsService {
       queryBuilder.andWhere('customer.name LIKE :customerName', { customerName: `%${customerName}%` });
     }
 
+    if (startDate && endDate) {
+      queryBuilder.andWhere('booking.bookingDate BETWEEN :startDate AND :endDate', { startDate, endDate });
+    } else if (startDate) {
+      queryBuilder.andWhere('booking.bookingDate >= :startDate', { startDate });
+    } else if (endDate) {
+      queryBuilder.andWhere('booking.bookingDate <= :endDate', { endDate });
+    }
+
     const [data, total] = await queryBuilder.getManyAndCount();
 
     return { data, total, page, limit };
   }
-
   async findOne(id: string): Promise<BookingDetail> {
     const bookingDetail = await this.bookingDetailsRepository.findOne({ where: { id }, relations: ['booking', 'position', 'timeSlot'] });
     if (!bookingDetail) {

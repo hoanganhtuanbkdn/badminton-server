@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/common';
 import { BookingDetailsService } from './booking-details.service';
-import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto } from './dto';
+import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { BookingDetail } from './booking-details.entity';
 
@@ -18,15 +18,19 @@ export class BookingDetailsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all booking details with pagination and sorting' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
-  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
-  @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
-  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
+  @ApiOperation({ summary: 'Get all booking details with pagination, sorting, and filtering' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number for pagination' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page for pagination' })
+  @ApiQuery({ name: 'sortBy', required: false, enum: SortByFields, description: 'Field to sort by (createdAt or bookingDate)' })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: SortOrder, description: 'Sort order (ASC or DESC)' })
   @ApiQuery({ name: 'courtId', required: false, description: 'Filter by court ID' })
   @ApiQuery({ name: 'positionId', required: false, description: 'Filter by position ID' })
   @ApiQuery({ name: 'ownerId', required: false, description: 'Filter by owner ID' })
-  @ApiResponse({ status: 200, description: 'Return all booking details with pagination and sorting.', type: [BookingDetail] })
+  @ApiQuery({ name: 'paymentStatus', required: false, description: 'Filter by payment status (e.g., Paid, Unpaid)' })
+  @ApiQuery({ name: 'customerName', required: false, description: 'Search by customer name' })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Start date for filtering by bookingDate' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'End date for filtering by bookingDate' })
+  @ApiResponse({ status: 200, description: 'Return all booking details with pagination, sorting, and filtering.', type: [BookingDetail] })
   findAll(@Query() getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
     return this.bookingDetailsService.findAll(getBookingDetailsDto);
   }
