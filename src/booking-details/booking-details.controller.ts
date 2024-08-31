@@ -3,6 +3,7 @@ import { BookingDetailsService } from './booking-details.service';
 import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { BookingDetail } from './booking-details.entity';
+import { GetDashboardOverviewDto, OverviewPeriod } from './dto/get-dashboard-overview.dto';
 
 @ApiTags('booking-details')
 @Controller('booking-details')
@@ -33,6 +34,19 @@ export class BookingDetailsController {
   @ApiResponse({ status: 200, description: 'Return all booking details with pagination, sorting, and filtering.', type: [BookingDetail] })
   findAll(@Query() getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
     return this.bookingDetailsService.findAll(getBookingDetailsDto);
+  }
+
+  @Get('/overview')
+  @ApiOperation({ summary: 'Get dashboard overview for bookings' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dashboard overview retrieved successfully.',
+  })
+  @ApiQuery({ name: 'period', enum: OverviewPeriod, description: 'Display period: today, this week, this month, this quarter, or custom' })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Start date (used when period is CUSTOM)' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'End date (used when period is CUSTOM)' })
+  getBookingsOverview(@Query() getDashboardOverviewDto: GetDashboardOverviewDto) {
+    return this.bookingDetailsService.getOverview(getDashboardOverviewDto);
   }
 
   @Get(':id')

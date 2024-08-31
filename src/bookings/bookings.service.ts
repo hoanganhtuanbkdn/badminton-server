@@ -3,10 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Booking } from './bookings.entity';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto } from './dto';
-import { BookingDetail } from 'src/booking-details/booking-details.entity';
+import { BookingDetail, BookingType } from 'src/booking-details/booking-details.entity';
 import { Customer } from 'src/customers/customers.entity';
 import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
-import { GetDashboardOverviewDto, OverviewPeriod } from './dto/get-dashboard-overview.dto';
+import { TimeSlot } from 'src/timeslots/timeslots.entity';
 
 @Injectable()
 export class BookingsService {
@@ -18,6 +18,9 @@ export class BookingsService {
 
     @InjectRepository(BookingDetail)
     private readonly bookingDetailsRepository: Repository<BookingDetail>,
+    @InjectRepository(TimeSlot)
+    private readonly timeSlotRepository: Repository<TimeSlot>,
+
   ) { }
 
   async createMultiple(createMultipleBookingsDto: any): Promise<Booking[]> {
@@ -51,13 +54,25 @@ export class BookingsService {
 
       // Save booking details if provided
       if (bookingDetails && bookingDetails.length > 0) {
-        const bookingDetailsEntities = bookingDetails.map(detail => {
+        const bookingDetailsEntities = await Promise.all(bookingDetails.map(async (detail) => {
+          const timeSlot = await this.timeSlotRepository.findOne({ where: { id: detail.timeSlotId } });
+
+          let bookingAmount = 0;
+
+          // Calculate the booking amount based on the booking type
+          if (detail.bookingType === BookingType.WALK_IN) {
+            bookingAmount = timeSlot.walkInFee * detail.duration;
+          } else if (detail.bookingType === BookingType.SCHEDULED) {
+            bookingAmount = timeSlot.fixedFee * detail.duration;
+          }
+
           return this.bookingDetailsRepository.create({
             ...detail,
+            bookingAmount,
             courtId: bookingData.courtId,
             bookingId: savedBooking.id,
           });
-        });
+        }));
         await this.bookingDetailsRepository.save(bookingDetailsEntities);
       }
 
@@ -69,45 +84,6 @@ export class BookingsService {
     } catch (e) {
       throw new BadRequestException(e.message);
     }
-  }
-
-  async getOverview(dto: any) {
-    const { period, startDate, endDate } = dto;
-
-    const queryBuilder = this.bookingsRepository.createQueryBuilder('booking')
-      .select([
-        'COUNT(booking.id) as totalOrders',
-        'SUM(booking.totalAmount) as totalRevenue',
-        'COUNT(DISTINCT booking.customerId) as totalCustomers',
-        'SUM(CASE WHEN booking.paymentStatus = \'Paid\' THEN 1 ELSE 0 END) as paidOrders',
-        'SUM(CASE WHEN booking.paymentStatus = \'Unpaid\' THEN 1 ELSE 0 END) as unpaidOrders'
-      ]);
-
-    // // Xử lý điều kiện dựa trên period
-    // switch (period) {
-    //   case OverviewPeriod.TODAY:
-    //     queryBuilder = queryBuilder.where('DATE(booking.createdAt) = CURDATE()');
-    //     break;
-    //   case OverviewPeriod.THIS_WEEK:
-    //     queryBuilder = queryBuilder.where('YEARWEEK(booking.createdAt, 1) = YEARWEEK(CURDATE(), 1)');
-    //     break;
-    //   case OverviewPeriod.THIS_MONTH:
-    //     queryBuilder = queryBuilder.where('MONTH(booking.createdAt) = MONTH(CURDATE())')
-    //       .andWhere('YEAR(booking.createdAt) = YEAR(CURDATE())');
-    //     break;
-    //   case OverviewPeriod.THIS_QUARTER:
-    //     queryBuilder = queryBuilder.where('QUARTER(booking.createdAt) = QUARTER(CURDATE())')
-    //       .andWhere('YEAR(booking.createdAt) = YEAR(CURDATE())');
-    //     break;
-    //   case OverviewPeriod.CUSTOM:
-    //     if (startDate && endDate) {
-    //       queryBuilder = queryBuilder.where('booking.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
-    //     }
-    //     break;
-    // }
-
-    const overviewData = await queryBuilder.getRawOne();
-    return overviewData;
   }
 
   // Get all bookings with pagination, sorting, and filtering

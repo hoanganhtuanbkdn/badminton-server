@@ -4,7 +4,6 @@ import { BookingsService } from './bookings.service';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto, SortOrder } from './dto';
 import { Booking } from './bookings.entity';
 import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
-import { GetDashboardOverviewDto } from './dto/get-dashboard-overview.dto';
 
 @ApiTags('bookings')
 @Controller('bookings')
@@ -70,11 +69,5 @@ export class BookingsController {
     return this.bookingsService.remove(id);
   }
 
-  @Get('/overview')
-  @ApiOperation({ summary: 'Get dashboard overview' })
-  @ApiResponse({ status: 200, description: 'Dashboard overview retrieved successfully.' })
-  getOverview(@Query() getDashboardOverviewDto: GetDashboardOverviewDto) {
-    console.log('getDashboardOverviewDto', getDashboardOverviewDto);
-    return this.bookingsService.getOverview(getDashboardOverviewDto);
-  }
+
 }

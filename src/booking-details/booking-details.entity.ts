@@ -143,6 +143,13 @@ export class BookingDetail {
   @Column({ name: "booking_date" })
   bookingDate: string;
 
+  @ApiProperty({
+    description: 'The total amount for the booking detail',
+    example: 150000,
+  })
+  @Column({ name: 'booking_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  bookingAmount: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
