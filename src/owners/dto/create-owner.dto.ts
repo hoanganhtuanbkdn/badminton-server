@@ -49,4 +49,12 @@ export class CreateOwnerDto {
   @Matches(/^\d+$/, { message: 'Số tài khoản ngân hàng thụ hưởng. Chỉ nhập số, tối thiểu 6 ký tự, tối đa 19 kí tự.' })
   @IsOptional()
   accountNo?: string;
+
+  @ApiProperty({
+    description: 'Mã định danh ngân hàng (thường gọi là BIN) 6 chữ số, quy đinh bởi ngân hàng nước',
+    example: '970436',
+  })
+  @IsString()
+  @IsOptional()
+  acqId?: string;
 }
