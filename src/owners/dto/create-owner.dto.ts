@@ -28,7 +28,7 @@ export class CreateOwnerDto {
   })
   @IsString()
   @Length(5, 50)
-  @Matches(/^[A-Z0-9 ]+$/, { message: 'Account name must contain only uppercase letters, numbers, and spaces.' })
+  @Matches(/^[A-Z0-9 ]+$/, { message: 'Tên tài khoản ngân hàng. Nhập tiếng Việt không dấu, viết hoa, tối thiểu 5 ký tự, tối đa 50 kí tự, không chứa các ký tự đặc biệt.' })
   @IsOptional()
   accountName?: string;
 

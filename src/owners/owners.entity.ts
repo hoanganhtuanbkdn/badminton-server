@@ -38,11 +38,11 @@ export class Owner {
   phoneNumber: string;
 
   @ApiProperty({
-    description: 'Name of the account holder receiving the payment',
+    description: 'Tên tài khoản ngân hàng. Nhập tiếng Việt không dấu, viết hoa, tối thiểu 5 ký tự, tối đa 50 kí tự, không chứa các ký tự đặc biệt.',
     example: 'John Doe',
   })
   @Column({ nullable: true })
-  accountHolder: string;
+  accountName: string;
 
   @ApiProperty({
     description: 'Name of the bank where the account is held',
@@ -52,11 +52,19 @@ export class Owner {
   bankName: string;
 
   @ApiProperty({
-    description: 'Bank account number',
+    description: 'Số tài khoản ngân hàng thụ hưởng. Chỉ nhập số, tối thiểu 6 ký tự, tối đa 19 kí tự',
     example: '1234567890',
   })
   @Column({ nullable: true })
-  accountNumber: string;
+  accountNo: string;
+
+
+  @ApiProperty({
+    description: 'Mã định danh ngân hàng (thường gọi là BIN) 6 chữ số, quy đinh bởi ngân hàng nước',
+    example: '1234567890',
+  })
+  @Column({ nullable: true })
+  acqId: string;
 
   @ApiProperty({
     description: 'List of courts associated with the owner',
