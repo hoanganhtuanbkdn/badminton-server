@@ -18,51 +18,56 @@ export class BookingDetailsService {
   }
 
   async findAll(getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
-    const { page = 1, limit = 10, sortBy = SortByFields.CREATED_AT, sortOrder = SortOrder.DESC, courtId, positionId, ownerId, paymentStatus, customerName, startDate, endDate } = getBookingDetailsDto;
+    try {
+      const { page = 1, limit = 10, sortBy = SortByFields.CREATED_AT, sortOrder = SortOrder.DESC, courtId, positionId, ownerId, paymentStatus, customerName, startDate, endDate } = getBookingDetailsDto;
 
-    const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
-      .leftJoinAndSelect('bookingDetail.booking', 'booking')
-      .leftJoinAndSelect('bookingDetail.position', 'position')
-      .leftJoinAndSelect('bookingDetail.timeSlot', 'timeSlot')
-      .leftJoinAndSelect('bookingDetail.court', 'court')
-      .leftJoinAndSelect('bookingDetail.owner', 'owner')
-      .leftJoinAndSelect('booking.customer', 'customer')
-      .leftJoinAndSelect('booking.payments', 'payments')
-      .orderBy(`bookingDetail.${sortBy}`, sortOrder)
-      .skip((page - 1) * limit)
-      .take(limit);
+      const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
+        .leftJoinAndSelect('bookingDetail.booking', 'booking')
+        .leftJoinAndSelect('bookingDetail.position', 'position')
+        .leftJoinAndSelect('bookingDetail.timeSlot', 'timeSlot')
+        .leftJoinAndSelect('bookingDetail.court', 'court')
+        .leftJoinAndSelect('bookingDetail.owner', 'owner')
+        .leftJoinAndSelect('booking.customer', 'customer')
+        .leftJoinAndSelect('booking.payments', 'payments')
+        .orderBy(`bookingDetail.${sortBy}`, sortOrder)
+        .skip((page - 1) * limit)
+        .take(limit);
 
-    if (courtId) {
-      queryBuilder.andWhere('bookingDetail.courtId = :courtId', { courtId });
+      if (courtId) {
+        queryBuilder.andWhere('bookingDetail.courtId = :courtId', { courtId });
+      }
+
+      if (positionId) {
+        queryBuilder.andWhere('bookingDetail.positionId = :positionId', { positionId });
+      }
+
+      if (ownerId) {
+        queryBuilder.andWhere('bookingDetail.ownerId = :ownerId', { ownerId });
+      }
+
+      if (paymentStatus) {
+        queryBuilder.andWhere('booking.paymentStatus = :paymentStatus', { paymentStatus });
+      }
+
+      if (customerName) {
+        queryBuilder.andWhere('customer.name LIKE :customerName', { customerName: `%${customerName}%` });
+      }
+
+      if (startDate && endDate) {
+        queryBuilder.andWhere('bookingDetail.bookingDate BETWEEN :startDate AND :endDate', { startDate, endDate });
+      } else if (startDate) {
+        queryBuilder.andWhere('bookingDetail.bookingDate >= :startDate', { startDate });
+      } else if (endDate) {
+        queryBuilder.andWhere('bookingDetail.bookingDate <= :endDate', { endDate });
+      }
+
+      const [data, total] = await queryBuilder.getManyAndCount();
+
+      return { data, total, page, limit };
+
+    } catch (e) {
+      throw new BadRequestException(e.message);
     }
-
-    if (positionId) {
-      queryBuilder.andWhere('bookingDetail.positionId = :positionId', { positionId });
-    }
-
-    if (ownerId) {
-      queryBuilder.andWhere('bookingDetail.ownerId = :ownerId', { ownerId });
-    }
-
-    if (paymentStatus) {
-      queryBuilder.andWhere('booking.paymentStatus = :paymentStatus', { paymentStatus });
-    }
-
-    if (customerName) {
-      queryBuilder.andWhere('customer.name LIKE :customerName', { customerName: `%${customerName}%` });
-    }
-
-    if (startDate && endDate) {
-      queryBuilder.andWhere('booking.bookingDate BETWEEN :startDate AND :endDate', { startDate, endDate });
-    } else if (startDate) {
-      queryBuilder.andWhere('booking.bookingDate >= :startDate', { startDate });
-    } else if (endDate) {
-      queryBuilder.andWhere('booking.bookingDate <= :endDate', { endDate });
-    }
-
-    const [data, total] = await queryBuilder.getManyAndCount();
-
-    return { data, total, page, limit };
   }
 
 
