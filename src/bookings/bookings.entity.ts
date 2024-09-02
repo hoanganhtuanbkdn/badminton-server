@@ -28,12 +28,32 @@ export class Booking {
   @Column({ name: 'voucher_code', nullable: true })
   voucherCode: string;
 
-  @ApiProperty({
-    description: 'Total amount for the booking',
-    example: 150000,
+  @Column('decimal', {
+    name: 'total_amount',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    comment: 'The total amount before any discounts are applied'
   })
-  @Column('decimal', { name: 'total_amount' })
   totalAmount: number;
+
+  @Column('decimal', {
+    name: 'final_amount',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    comment: 'The final amount after discounts are applied'
+  })
+  finalAmount: number;
+
+  @Column('decimal', {
+    name: 'discount_info',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    comment: 'The discount value applied to the booking'
+  })
+  discountInfo: number;
 
   @ApiProperty({
     description: 'Payment status of the booking',

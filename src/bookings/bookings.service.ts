@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Booking } from './bookings.entity';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto } from './dto';
 import { BookingDetail, BookingType } from 'src/booking-details/booking-details.entity';
 import { Customer } from 'src/customers/customers.entity';
 import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
+import { Voucher } from 'src/vouchers/vouchers.entity';
 
 @Injectable()
 export class BookingsService {
@@ -21,6 +22,8 @@ export class BookingsService {
     @InjectRepository(TimeSlot)
     private readonly timeSlotRepository: Repository<TimeSlot>,
 
+    @InjectRepository(Voucher)
+    private vouchersRepository: Repository<Voucher>,
   ) { }
 
   async createMultiple(createMultipleBookingsDto: any): Promise<Booking[]> {
@@ -35,9 +38,8 @@ export class BookingsService {
   // Create a new booking
   async create(createBookingDto: any): Promise<Booking> {
     try {
-      const { customer, bookingDetails, ...bookingData } = createBookingDto;
+      const { customer, bookingDetails, voucherCode, ...bookingData } = createBookingDto;
 
-      console.log(111, customer, bookingDetails, bookingData);
       // Create the booking entity
       const booking = this.bookingsRepository.create({
         ...bookingData,
@@ -46,35 +48,81 @@ export class BookingsService {
       // Save the booking to get the ID
       const savedBooking: any = await this.bookingsRepository.save(booking);
 
-      console.log('savedBooking', savedBooking);
       if (customer) {
         const customerEntity = this.customersRepository.create({ ...customer, bookingId: savedBooking.id });
         await this.customersRepository.save(customerEntity);
       }
 
-      // Save booking details if provided
+      // Calculate the total amount based on booking details
+      let totalAmount = 0;
+
       if (bookingDetails && bookingDetails.length > 0) {
-        const bookingDetailsEntities = await Promise.all(bookingDetails.map(async (detail) => {
-          const timeSlot = await this.timeSlotRepository.findOne({ where: { id: detail.timeSlotId } });
+        const bookingDetailsEntities = await Promise.all(
+          bookingDetails.map(async (detail) => {
+            const timeSlot = await this.timeSlotRepository.findOne({ where: { id: detail.timeSlotId } });
 
-          let bookingAmount = 0;
+            let bookingAmount = 0;
 
-          // Calculate the booking amount based on the booking type
-          if (detail.bookingType === BookingType.WALK_IN) {
-            bookingAmount = timeSlot.walkInFee * detail.duration;
-          } else if (detail.bookingType === BookingType.SCHEDULED) {
-            bookingAmount = timeSlot.fixedFee * detail.duration;
-          }
+            // Calculate the booking amount based on the booking type
+            if (detail.bookingType === BookingType.WALK_IN) {
+              bookingAmount = timeSlot.walkInFee * detail.duration;
+            } else if (detail.bookingType === BookingType.SCHEDULED) {
+              bookingAmount = timeSlot.fixedFee * detail.duration;
+            }
 
-          return this.bookingDetailsRepository.create({
-            ...detail,
-            bookingAmount,
-            courtId: bookingData.courtId,
-            bookingId: savedBooking.id,
-          });
-        }));
+            totalAmount += bookingAmount;
+
+            return this.bookingDetailsRepository.create({
+              ...detail,
+              bookingAmount,
+              courtId: bookingData.courtId,
+              bookingId: savedBooking.id,
+            });
+          }),
+        );
         await this.bookingDetailsRepository.save(bookingDetailsEntities);
       }
+
+      // Apply voucher code if provided
+      let discountInfo = 0;
+
+      if (voucherCode) {
+        const voucher = await this.vouchersRepository.findOne({ where: { code: voucherCode } });
+
+        if (voucher) {
+          const currentDate = new Date();
+
+          // Check if the voucher is valid based on validFrom, validUntil, and availableUsage
+          const isValidFrom = voucher.validFrom ? new Date(voucher.validFrom) <= currentDate : true;
+          const isValidUntil = voucher.validUntil ? new Date(voucher.validUntil) >= currentDate : true;
+          const isAvailableUsage = voucher.availableUsage !== undefined ? voucher.availableUsage > 0 : true;
+
+          if (isValidFrom && isValidUntil && isAvailableUsage) {
+            if (voucher.discountPercentage > 0) {
+              discountInfo = (totalAmount * voucher.discountPercentage) / 100;
+            } else if (voucher.discountValue > 0) {
+              discountInfo = voucher.discountValue;
+            }
+
+            discountInfo = Math.min(discountInfo, totalAmount); // Ensure discount doesn't exceed total amount
+
+            // Decrement the availableUsage if applicable
+            if (voucher.availableUsage !== undefined) {
+              voucher.availableUsage -= 1;
+              await this.vouchersRepository.save(voucher);
+            }
+          }
+        }
+      }
+
+      const finalAmount = totalAmount - discountInfo;
+
+      // Update the booking with total amount, final amount, and discount info
+      await this.bookingsRepository.update(savedBooking.id, {
+        totalAmount,
+        finalAmount,
+        discountInfo,
+      });
 
       // Return the fully populated booking entity
       return this.bookingsRepository.findOne({
@@ -83,6 +131,75 @@ export class BookingsService {
       });
     } catch (e) {
       throw new BadRequestException(e.message);
+    }
+  }
+
+  async recalculateOldBookings(): Promise<void> {
+    try {
+      // Fetch all bookings with null values in the fields that need recalculation
+      const bookingsToUpdate = await this.bookingsRepository.find({
+        where: [
+          { totalAmount: IsNull() },
+          { finalAmount: IsNull() },
+          { discountInfo: IsNull() },
+        ],
+        relations: ['bookingDetails', 'customer', 'bookingDetails.timeSlot'],
+      });
+
+      for (const booking of bookingsToUpdate) {
+        let totalAmount = 0;
+        let finalAmount = 0;
+        let discountInfo = 0;
+
+        // Recalculate totalAmount based on bookingDetails
+        for (const detail of booking.bookingDetails) {
+          const bookingAmount = detail.bookingType === BookingType.WALK_IN
+            ? detail.timeSlot.walkInFee * detail.duration
+            : detail.timeSlot.fixedFee * detail.duration;
+
+          totalAmount += bookingAmount;
+        }
+
+        // Apply voucher if available
+        if (booking.voucherCode) {
+          const voucher = await this.vouchersRepository.findOne({ where: { code: booking.voucherCode } });
+
+          if (voucher) {
+            const currentDate = new Date();
+            const isValidFrom = voucher.validFrom ? new Date(voucher.validFrom) <= currentDate : true;
+            const isValidUntil = voucher.validUntil ? new Date(voucher.validUntil) >= currentDate : true;
+            const isAvailableUsage = voucher.availableUsage !== undefined ? voucher.availableUsage > 0 : true;
+
+            if (isValidFrom && isValidUntil && isAvailableUsage) {
+              if (voucher.discountPercentage > 0) {
+                discountInfo = (totalAmount * voucher.discountPercentage) / 100;
+              } else if (voucher.discountValue > 0) {
+                discountInfo = voucher.discountValue;
+              }
+
+              discountInfo = Math.min(discountInfo, totalAmount);
+              finalAmount = totalAmount - discountInfo;
+
+              // Decrement the availableUsage if applicable
+              if (voucher.availableUsage !== undefined) {
+                voucher.availableUsage -= 1;
+                await this.vouchersRepository.save(voucher);
+              }
+            }
+          }
+        } else {
+          finalAmount = totalAmount;
+        }
+
+        // Update the booking with the recalculated values
+        booking.totalAmount = totalAmount;
+        booking.finalAmount = finalAmount;
+        booking.discountInfo = discountInfo;
+
+        await this.bookingsRepository.save(booking);
+      }
+    } catch (e) {
+      throw new BadRequestException(`Error recalculating bookings: ${e.message}`);
     }
   }
 

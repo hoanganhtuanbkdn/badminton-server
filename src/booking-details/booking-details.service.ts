@@ -70,8 +70,6 @@ export class BookingDetailsService {
     }
   }
 
-
-
   async getOverview(dto: any) {
     const { period, startDate, endDate } = dto;
 
@@ -80,13 +78,14 @@ export class BookingDetailsService {
       .leftJoin('booking.customer', 'customer')
       .select([
         'COUNT(bookingDetail.id) as totalBookingDetails',
-        'SUM(bookingDetail.bookingAmount) as totalBookingAmount',
+        'SUM(booking.finalAmount) as totalBookingAmount',
+        'SUM(CASE WHEN booking.paymentStatus = \'Paid\' THEN booking.finalAmount ELSE 0 END) as totalPaidAmount',
+        'SUM(CASE WHEN booking.paymentStatus != \'Paid\' THEN booking.finalAmount ELSE 0 END) as totalUnpaidAmount',
         'SUM(CASE WHEN booking.paymentStatus = \'Paid\' THEN 1 ELSE 0 END) as paidCount',
         'SUM(CASE WHEN booking.paymentStatus != \'Paid\' THEN 1 ELSE 0 END) as unpaidCount',
         'COUNT(DISTINCT customer.id) as totalCustomers'
       ]);
 
-    // Apply conditions based on the period
     switch (period) {
       case OverviewPeriod.TODAY:
         queryBuilder = queryBuilder.where('DATE(bookingDetail.createdAt) = CURRENT_DATE');
@@ -116,7 +115,15 @@ export class BookingDetailsService {
 
     const overviewData = await queryBuilder.getRawOne();
 
-    return overviewData;
+    return {
+      paidCount: overviewData?.paidcount,
+      totalBookingAmount: overviewData?.totalbookingamount,
+      totalBookingDetails: overviewData?.totalbookingdetails,
+      totalCustomers: overviewData?.totalcustomers,
+      totalPaidAmount: overviewData?.totalpaidamount,
+      totalUnpaidAmount: overviewData?.totalunpaidamount,
+      unpaidCount: overviewData?.unpaidcount,
+    };
   }
   async findOne(id: string): Promise<BookingDetail> {
     const bookingDetail = await this.bookingDetailsRepository.findOne({ where: { id }, relations: ['booking', 'position', 'timeSlot'] });

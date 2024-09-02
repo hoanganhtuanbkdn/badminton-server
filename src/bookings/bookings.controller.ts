@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto, SortOrder } from './dto';
@@ -17,6 +17,13 @@ export class BookingsController {
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   create(@Body() createBookingDto: any): Promise<Booking> {
     return this.bookingsService.create(createBookingDto);
+  }
+
+  @Post('recalculate-old-bookings')
+  @HttpCode(HttpStatus.OK)
+  async recalculateOldBookings(): Promise<{ message: string }> {
+    await this.bookingsService.recalculateOldBookings();
+    return { message: 'Old bookings have been recalculated successfully.' };
   }
 
   @Post('/multiple')
