@@ -71,6 +71,21 @@ export class Booking {
   additionalNotes: string;
 
   @ApiProperty({
+    description: 'Booking Code for the booking',
+    example: 'VM123456',
+    required: false,
+  })
+  @Column({ name: 'booking_code', nullable: true })
+  bookingCode: string;
+
+  @ApiProperty({
+    description: 'Payment time',
+    required: false,
+  })
+  @Column({ name: 'payment_at', nullable: true })
+  paymentAt: string;
+
+  @ApiProperty({
     description: 'Booking mode (e.g., BOOK_COURT, JOIN_COURT)',
     example: BookingMode.BOOK_COURT,
   })
