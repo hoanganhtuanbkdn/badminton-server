@@ -38,6 +38,23 @@ export class CreateBookingDto {
   voucherCode?: string;
 
   @ApiProperty({
+    description: 'Booking Code',
+    example: 'VM123456',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  bookingCode?: string;
+
+  @ApiProperty({
+    description: 'Payment time',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  paymentAt?: string;
+
+  @ApiProperty({
     description: 'Additional notes for the booking',
     example: 'Please prepare court in advance',
     required: false,
