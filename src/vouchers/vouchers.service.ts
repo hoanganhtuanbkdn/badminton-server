@@ -16,12 +16,43 @@ export class VouchersService {
     return this.vouchersRepository.save(voucher);
   }
 
-  findAll(): Promise<Voucher[]> {
-    return this.vouchersRepository.find();
+  async findAll(query: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'ASC' | 'DESC';
+  }): Promise<{ data: Voucher[]; total: number }> {
+    console.log('query', query);
+
+    const { page, limit, sortBy = 'createdAt', sortOrder = 'DESC', } = query;
+    console.log('page', page, limit);
+    const where: any = {};
+    let data: Voucher[];
+    let total: number;
+
+    if (page && limit) {
+      [data, total] = await this.vouchersRepository.findAndCount({
+        where,
+        order: { [sortBy]: sortOrder },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+    } else {
+      data = await this.vouchersRepository.find({
+        where,
+        order: { [sortBy]: sortOrder },
+      });
+      total = data.length;
+    }
+    return { data, total };
   }
 
   findOne(id: string): Promise<Voucher> {
     return this.vouchersRepository.findOne({ where: { id } });
+  }
+
+  async checkVoucher(code: string): Promise<Voucher | null> {
+    return this.vouchersRepository.findOne({ where: { code } });
   }
 
   async update(id: string, updateVoucherDto: UpdateVoucherDto): Promise<Voucher> {
