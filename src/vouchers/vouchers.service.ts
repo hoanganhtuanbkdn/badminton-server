@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Voucher } from './vouchers.entity';
@@ -52,10 +52,34 @@ export class VouchersService {
   }
 
   async checkVoucher(code: string): Promise<Voucher | null> {
-    return this.vouchersRepository.findOne({ where: { code } });
+    const voucher = await this.vouchersRepository.findOne({ where: { code } });
+
+    if (!voucher) {
+      throw new NotFoundException('Voucher not found.');
+    }
+
+    const currentDate = new Date();
+
+    // Check validFrom (voucher is not valid if currentDate is before validFrom)
+    if (voucher.validFrom && currentDate < voucher.validFrom) {
+      throw new BadRequestException('Voucher is not valid yet.');
+    }
+
+    // Check validUntil (voucher is expired if currentDate is after validUntil)
+    if (voucher.validUntil && currentDate > voucher.validUntil) {
+      throw new BadRequestException('Voucher has expired.');
+    }
+
+    // Check availableUsage (voucher is not usable if availableUsage is less than or equal to 0)
+    if (voucher.availableUsage <= 0) {
+      throw new BadRequestException('Voucher has no available uses left.');
+    }
+
+    return voucher;
   }
 
   async update(id: string, updateVoucherDto: UpdateVoucherDto): Promise<Voucher> {
+    console.log('updateVoucherDto', id, updateVoucherDto);
     await this.vouchersRepository.update(id, updateVoucherDto);
     return this.findOne(id);
   }

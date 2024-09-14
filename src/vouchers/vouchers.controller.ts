@@ -32,13 +32,13 @@ export class VouchersController {
   ) {
     return this.vouchersService.findAll({ page, limit, sortBy, sortOrder });
   }
-
   @ApiOperation({ summary: 'Check voucher by code' })
   @ApiParam({ name: 'code', description: 'Voucher code to check', example: 'SUMMER2024' })
-  @ApiResponse({ status: 200, description: 'Voucher found.' })
+  @ApiResponse({ status: 200, description: 'Voucher is valid.' })
   @ApiResponse({ status: 404, description: 'Voucher not found.' })
+  @ApiResponse({ status: 400, description: 'Voucher is not valid yet, expired, or has no available uses.' })
   @Get('check/:code')
-  checkVoucher(@Param('code') code: string) {
+  async checkVoucher(@Param('code') code: string) {
     return this.vouchersService.checkVoucher(code);
   }
 
@@ -57,7 +57,7 @@ export class VouchersController {
   @ApiResponse({ status: 200, description: 'Voucher updated successfully.' })
   @ApiResponse({ status: 404, description: 'Voucher not found.' })
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateVoucherDto: UpdateVoucherDto) {
+  update(@Param('id') id: string, @Body() updateVoucherDto: any) {
     return this.vouchersService.update(id, updateVoucherDto);
   }
 

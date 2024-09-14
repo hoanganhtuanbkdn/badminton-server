@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { BookingDetail } from './booking-details.entity';
 import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
 import { OverviewPeriod } from './dto/get-dashboard-overview.dto';
@@ -50,7 +50,12 @@ export class BookingDetailsService {
       }
 
       if (customerName) {
-        queryBuilder.andWhere('customer.name LIKE :customerName', { customerName: `%${customerName}%` });
+        queryBuilder.andWhere(
+          new Brackets(qb => {
+            qb.where('customer.name LIKE :customerName', { customerName: `%${customerName}%` })
+              .orWhere('customer.phoneNumber LIKE :customerName', { customerName: `%${customerName}%` });
+          })
+        );
       }
 
       if (startDate && endDate) {
