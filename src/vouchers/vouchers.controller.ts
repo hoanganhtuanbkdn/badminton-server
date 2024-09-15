@@ -32,12 +32,13 @@ export class VouchersController {
   ) {
     return this.vouchersService.findAll({ page, limit, sortBy, sortOrder });
   }
+
   @ApiOperation({ summary: 'Check voucher by code' })
   @ApiParam({ name: 'code', description: 'Voucher code to check', example: 'SUMMER2024' })
   @ApiResponse({ status: 200, description: 'Voucher is valid.' })
   @ApiResponse({ status: 404, description: 'Voucher not found.' })
   @ApiResponse({ status: 400, description: 'Voucher is not valid yet, expired, or has no available uses.' })
-  @Get('check/:code')
+  @Post('check/:code')
   async checkVoucher(@Param('code') code: string) {
     return this.vouchersService.checkVoucher(code);
   }
