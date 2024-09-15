@@ -15,7 +15,7 @@ export class CourtsService {
     private ownersRepository: Repository<Owner>,
   ) { }
 
-  async create(createCourtDto: any): Promise<Court> {
+  async create(createCourtDto: any) {
     const { ownerId, ...courtData } = createCourtDto;
 
     const owner = await this.ownersRepository.findOne({ where: { id: ownerId } });
