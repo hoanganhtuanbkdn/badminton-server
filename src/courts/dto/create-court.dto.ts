@@ -52,4 +52,25 @@ export class CreateCourtDto {
   @IsString()
   @IsNotEmpty()
   ownerId: string;
+
+  @ApiProperty({
+    description: 'duration',
+    example: 1,
+  })
+  @IsOptional()
+  duration: number;
+
+  @ApiProperty({
+    description: 'Fixed fee for booking during this time slot',
+    example: 100000,
+  })
+  @IsOptional()
+  fixedFee: number;
+
+  @ApiProperty({
+    description: 'Walk-in fee for booking during this time slot',
+    example: 150000,
+  })
+  @IsOptional()
+  walkInFee: number;
 }

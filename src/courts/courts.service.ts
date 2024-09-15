@@ -15,7 +15,7 @@ export class CourtsService {
     private ownersRepository: Repository<Owner>,
   ) { }
 
-  async create(createCourtDto: CreateCourtDto): Promise<Court> {
+  async create(createCourtDto: any): Promise<Court> {
     const { ownerId, ...courtData } = createCourtDto;
 
     const owner = await this.ownersRepository.findOne({ where: { id: ownerId } });
@@ -56,7 +56,7 @@ export class CourtsService {
     return this.courtsRepository.findOne({ where: { id: id } });
   }
 
-  async update(id: string, updateCourtDto: UpdateCourtDto): Promise<Court> {
+  async update(id: string, updateCourtDto: any): Promise<Court> {
     await this.courtsRepository.update(id, updateCourtDto);
     return this.courtsRepository.findOne({ where: { id: id } });
   }

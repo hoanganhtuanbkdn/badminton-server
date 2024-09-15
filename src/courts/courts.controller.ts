@@ -13,7 +13,7 @@ export class CourtsController {
   @ApiBody({ type: CreateCourtDto })
   @ApiResponse({ status: 201, description: 'Court created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  create(@Body() createCourtDto: CreateCourtDto) {
+  create(@Body() createCourtDto: any) {
     return this.courtsService.create(createCourtDto);
   }
 
@@ -52,7 +52,7 @@ export class CourtsController {
   @ApiBody({ type: UpdateCourtDto })
   @ApiResponse({ status: 200, description: 'Court updated successfully' })
   @ApiResponse({ status: 404, description: 'Court not found' })
-  update(@Param('id') id: string, @Body() updateCourtDto: UpdateCourtDto) {
+  update(@Param('id') id: string, @Body() updateCourtDto: any) {
     return this.courtsService.update(id, updateCourtDto);
   }
 
