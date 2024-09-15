@@ -49,33 +49,6 @@ export class Position {
   @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.position)
   bookingDetails: BookingDetail[];
 
-  @ApiProperty({
-    description: 'duration',
-    example: 1,
-  })
-  @Column({
-    type: 'decimal',
-    precision: 3,
-    scale: 1,
-    nullable: true,
-    default: 0.5
-  })
-  duration: number;
-
-  @ApiProperty({
-    description: 'Fixed fee for booking during this time slot',
-    example: 100000,
-  })
-  @Column({ name: 'fixed_fee', nullable: true, default: 0 })
-  fixedFee: number;
-
-  @ApiProperty({
-    description: 'Walk-in fee for booking during this time slot',
-    example: 150000,
-  })
-  @Column({ name: 'walk_in_fee', nullable: true, default: 0 })
-  walkInFee: number;
-
   @CreateDateColumn({ name: 'created_at', nullable: true, default: "" })
   createdAt: Date;
 
