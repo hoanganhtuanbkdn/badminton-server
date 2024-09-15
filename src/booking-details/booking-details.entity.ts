@@ -144,6 +144,22 @@ export class BookingDetail {
   bookingDate: string;
 
   @ApiProperty({
+    description: 'The end time for the booking detail',
+    example: '10:30',
+    nullable: true,
+  })
+  @Column({ name: "start_time" })
+  startTime: string;
+
+  @ApiProperty({
+    description: 'The start time for the booking detail',
+    example: '11:00',
+    nullable: true,
+  })
+  @Column({ name: "end_time" })
+  endTime: string;
+
+  @ApiProperty({
     description: 'The total amount for the booking detail',
     example: 150000,
   })

@@ -52,6 +52,20 @@ export class CreateBookingDetailDto {
   bookingDate?: string;
 
   @ApiProperty({
+    description: 'The end time for the booking detail',
+    example: '10:30',
+    nullable: true,
+  })
+  startTime: string;
+
+  @ApiProperty({
+    description: 'The start time for the booking detail',
+    example: '11:00',
+    nullable: true,
+  })
+  endTime: string;
+
+  @ApiProperty({
     description: 'ID của sân liên kết với chi tiết này',
     example: 'courtId',
   })
