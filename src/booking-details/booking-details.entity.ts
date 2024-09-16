@@ -81,21 +81,6 @@ export class BookingDetail {
   ownerId: string;
 
   @ApiProperty({
-    description: 'Time slot associated with this detail',
-    type: () => TimeSlot,
-  })
-  @ManyToOne(() => TimeSlot, timeSlot => timeSlot.bookingDetails)
-  @JoinColumn({ name: 'time_slot_id' }) // Join column for timeSlotId
-  timeSlot: TimeSlot;
-
-  @ApiProperty({
-    description: 'Time slot ID for this detail',
-    example: 'uuid',
-  })
-  @Column({ name: 'time_slot_id' })
-  timeSlotId: string;
-
-  @ApiProperty({
     description: 'Duration of the booking in hours',
     example: 1.5,
   })
