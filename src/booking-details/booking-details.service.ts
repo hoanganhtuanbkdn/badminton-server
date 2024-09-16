@@ -24,7 +24,6 @@ export class BookingDetailsService {
       const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
         .leftJoinAndSelect('bookingDetail.booking', 'booking')
         .leftJoinAndSelect('bookingDetail.position', 'position')
-        .leftJoinAndSelect('bookingDetail.timeSlot', 'timeSlot')
         .leftJoinAndSelect('bookingDetail.court', 'court')
         .leftJoinAndSelect('bookingDetail.owner', 'owner')
         .leftJoinAndSelect('booking.customer', 'customer')
