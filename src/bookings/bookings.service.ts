@@ -8,12 +8,15 @@ import { Customer } from 'src/customers/customers.entity';
 import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Voucher } from 'src/vouchers/vouchers.entity';
+import { Court } from 'src/courts/courts.entity';
 
 @Injectable()
 export class BookingsService {
   constructor(
     @InjectRepository(Booking)
     private bookingsRepository: Repository<Booking>,
+    @InjectRepository(Court)
+    private courtsRepository: Repository<Court>,
     @InjectRepository(Customer)
     private readonly customersRepository: Repository<Customer>,
 
@@ -56,18 +59,27 @@ export class BookingsService {
       // Calculate the total amount based on booking details
       let totalAmount = 0;
 
+      const court = await this.courtsRepository.findOne({
+        where: {
+          id: bookingData.courtId
+        }
+      });
+
+      if (!court) {
+        throw new NotFoundException(`Court with ID "${bookingData.courtId}" not found`);
+      }
+
       if (bookingDetails && bookingDetails.length > 0) {
         const bookingDetailsEntities = await Promise.all(
           bookingDetails.map(async (detail) => {
-            const timeSlot = await this.timeSlotRepository.findOne({ where: { id: detail.timeSlotId } });
 
             let bookingAmount = 0;
 
             // Calculate the booking amount based on the booking type
             if (detail.bookingType === BookingType.WALK_IN) {
-              bookingAmount = timeSlot.walkInFee * detail.duration;
+              bookingAmount = Number(court.walkInFee || 0) * Number(detail.duration || 0);
             } else if (detail.bookingType === BookingType.SCHEDULED) {
-              bookingAmount = timeSlot.fixedFee * detail.duration;
+              bookingAmount = Number(court.fixedFee || 0) * Number(detail.duration || 0);
             }
 
             totalAmount += bookingAmount;

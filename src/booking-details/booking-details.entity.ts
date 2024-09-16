@@ -160,6 +160,18 @@ export class BookingDetail {
   endTime: string;
 
   @ApiProperty({
+    description: 'Indicates whether the user has reported an absence for this session',
+    example: false,
+  })
+  @Column({
+    name: 'is_absent',
+    type: 'boolean',
+    default: false,
+    nullable: true,
+  })
+  isAbsent: boolean;
+
+  @ApiProperty({
     description: 'The total amount for the booking detail',
     example: 150000,
   })
