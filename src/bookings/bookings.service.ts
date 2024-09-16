@@ -235,13 +235,13 @@ export class BookingsService {
         order: { [sortBy]: sortOrder },
         skip: (page - 1) * limit,
         take: limit,
-        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'payments'],
       });
     } else {
       data = await this.bookingsRepository.find({
         where,
         order: { [sortBy]: sortOrder },
-        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'payments'],
       });
       total = data.length;
     }
@@ -253,7 +253,7 @@ export class BookingsService {
   async findOne(id: string): Promise<Booking> {
     const booking = await this.bookingsRepository.findOne({
       where: { id },
-      relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+      relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'payments'],
     });
     if (!booking) {
       throw new NotFoundException(`Booking with ID "${id}" not found`);
