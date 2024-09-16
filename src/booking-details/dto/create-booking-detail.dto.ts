@@ -29,12 +29,16 @@ export class CreateBookingDetailDto {
     description: 'bookingDay: 0, 1, 2, 3, 4, 5, 6',
     example: "0",
   })
+  @IsString()
+  @IsNotEmpty()
   bookingDay?: string;
 
   @ApiProperty({
     description: 'bookingMonth: 5',
     example: "5",
   })
+  @IsString()
+  @IsNotEmpty()
   bookingMonth?: string;
 
   @ApiProperty({

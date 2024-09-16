@@ -113,35 +113,35 @@ export class BookingDetail {
   @ApiProperty({
     description: 'bookingMonth: 5',
     example: "5",
-    nullable: true,
   })
   @Column({
     name: 'booking_month',
+    nullable: true,
   })
   bookingMonth?: string;
 
   @ApiProperty({
     description: 'The date when the court is booked',
     example: '2024-08-28',
-    nullable: true,
+
   })
-  @Column({ name: "booking_date" })
+  @Column({ name: "booking_date", nullable: true, })
   bookingDate: string;
 
   @ApiProperty({
     description: 'The end time for the booking detail',
     example: '10:30',
-    nullable: true,
+
   })
-  @Column({ name: "start_time" })
+  @Column({ name: "start_time", nullable: true, })
   startTime: string;
 
   @ApiProperty({
     description: 'The start time for the booking detail',
     example: '11:00',
-    nullable: true,
+
   })
-  @Column({ name: "end_time" })
+  @Column({ name: "end_time", nullable: true, })
   endTime: string;
 
   @ApiProperty({
