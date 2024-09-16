@@ -165,9 +165,14 @@ export class BookingsService {
 
         // Recalculate totalAmount based on bookingDetails
         for (const detail of booking.bookingDetails) {
+          const court = await this.courtsRepository.findOne({
+            where: {
+              id: detail.courtId
+            }
+          });
           const bookingAmount = detail.bookingType === BookingType.WALK_IN
-            ? detail.timeSlot.walkInFee * detail.duration
-            : detail.timeSlot.fixedFee * detail.duration;
+            ? court.walkInFee * detail.duration
+            : court.fixedFee * detail.duration;
 
           totalAmount += bookingAmount;
         }
