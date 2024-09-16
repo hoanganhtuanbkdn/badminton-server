@@ -22,8 +22,6 @@ export class BookingsService {
 
     @InjectRepository(BookingDetail)
     private readonly bookingDetailsRepository: Repository<BookingDetail>,
-    @InjectRepository(TimeSlot)
-    private readonly timeSlotRepository: Repository<TimeSlot>,
 
     @InjectRepository(Voucher)
     private vouchersRepository: Repository<Voucher>,
@@ -139,7 +137,7 @@ export class BookingsService {
       // Return the fully populated booking entity
       return this.bookingsRepository.findOne({
         where: { id: savedBooking.id },
-        relations: ['customer', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+        relations: ['customer', 'bookingDetails', 'bookingDetails.position', 'payments'],
       });
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -155,7 +153,7 @@ export class BookingsService {
           { finalAmount: IsNull() },
           { discountInfo: IsNull() },
         ],
-        relations: ['bookingDetails', 'customer', 'bookingDetails.timeSlot'],
+        relations: ['bookingDetails', 'customer'],
       });
 
       for (const booking of bookingsToUpdate) {
