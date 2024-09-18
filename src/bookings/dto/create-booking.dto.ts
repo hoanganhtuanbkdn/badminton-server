@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { CreateBookingDetailDto } from 'src/booking-details/dto';
 import { CreateCustomerDto } from 'src/customers/dto';
+import { Column } from 'typeorm';
 
 export class CreateBookingDto {
   @ApiProperty({
@@ -27,6 +28,22 @@ export class CreateBookingDto {
   @IsString()
   @IsNotEmpty()
   paymentStatus: string;
+
+  @ApiProperty({
+    description: 'Payment method of the booking: Tiền mặt, chuyển khoản',
+    // example: 'Paid',
+  })
+  @IsString()
+  @IsNotEmpty()
+  paymentMethod: string;
+
+  @ApiProperty({
+    description: 'Payment type of the booking: Cọc trước 50%, trả trước 100%, trả sau',
+    // example: 'Paid',
+  })
+  @IsString()
+  @IsNotEmpty()
+  paymentType: string;
 
   @ApiProperty({
     description: 'Voucher code applied to the booking, if any',

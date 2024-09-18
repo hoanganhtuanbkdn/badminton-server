@@ -56,6 +56,20 @@ export class Booking {
   discountInfo: number;
 
   @ApiProperty({
+    description: 'Payment method of the booking: Tiền mặt, chuyển khoản',
+    // example: 'Paid',
+  })
+  @Column({ name: 'payment_method' })
+  paymentMethod: string;
+
+  @ApiProperty({
+    description: 'Payment type of the booking: Cọc trước 50%, trả trước 100%, trả sau',
+    example: 'Paid',
+  })
+  @Column({ name: 'payment_type' })
+  paymentType: string;
+
+  @ApiProperty({
     description: 'Payment status of the booking',
     example: 'Paid',
   })

@@ -61,9 +61,7 @@ export class BookingDetailsService {
       if (startDate && endDate) {
         queryBuilder.andWhere('bookingDetail.bookingDate BETWEEN :startDate AND :endDate', { startDate, endDate });
       } else if (startDate) {
-        queryBuilder.andWhere('bookingDetail.bookingDate >= :startDate', { startDate });
-      } else if (endDate) {
-        queryBuilder.andWhere('bookingDetail.bookingDate <= :endDate', { endDate });
+        queryBuilder.andWhere('bookingDetail.bookingDate = :startDate', { startDate });
       }
 
       const [data, total] = await queryBuilder.getManyAndCount();
