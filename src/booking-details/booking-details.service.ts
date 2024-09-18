@@ -137,7 +137,7 @@ export class BookingDetailsService {
     return bookingDetail;
   }
 
-  async update(id: string, updateBookingDetailDto: UpdateBookingDetailDto): Promise<BookingDetail> {
+  async update(id: string, updateBookingDetailDto: any): Promise<BookingDetail> {
     await this.bookingDetailsRepository.update(id, updateBookingDetailDto);
     return this.findOne(id);
   }

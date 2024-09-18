@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, Query, Patch } from '@nestjs/common';
 import { BookingDetailsService } from './booking-details.service';
 import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { BookingDetail } from './booking-details.entity';
 import { GetDashboardOverviewDto, OverviewPeriod } from './dto/get-dashboard-overview.dto';
 
@@ -58,12 +58,13 @@ export class BookingDetailsController {
     return this.bookingDetailsService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Update a booking detail' })
   @ApiParam({ name: 'id', description: 'ID of the booking detail to update' })
   @ApiResponse({ status: 200, description: 'The booking detail has been successfully updated.', type: BookingDetail })
   @ApiResponse({ status: 404, description: 'Booking detail not found.' })
-  update(@Param('id') id: string, @Body() updateBookingDetailDto: UpdateBookingDetailDto): Promise<BookingDetail> {
+  @ApiBody({ type: UpdateBookingDetailDto })
+  update(@Param('id') id: string, @Body() updateBookingDetailDto: any): Promise<BookingDetail> {
     return this.bookingDetailsService.update(id, updateBookingDetailDto);
   }
 
