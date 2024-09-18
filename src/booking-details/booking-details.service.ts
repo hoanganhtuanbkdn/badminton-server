@@ -24,7 +24,6 @@ export class BookingDetailsService {
       const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
         .leftJoinAndSelect('bookingDetail.booking', 'booking')
         .leftJoinAndSelect('bookingDetail.position', 'position')
-        .leftJoinAndSelect('bookingDetail.timeSlot', 'timeSlot')
         .leftJoinAndSelect('bookingDetail.court', 'court')
         .leftJoinAndSelect('bookingDetail.owner', 'owner')
         .leftJoinAndSelect('booking.customer', 'customer')
@@ -129,14 +128,14 @@ export class BookingDetailsService {
     };
   }
   async findOne(id: string): Promise<BookingDetail> {
-    const bookingDetail = await this.bookingDetailsRepository.findOne({ where: { id }, relations: ['booking', 'position', 'timeSlot'] });
+    const bookingDetail = await this.bookingDetailsRepository.findOne({ where: { id }, relations: ['booking', 'position'] });
     if (!bookingDetail) {
       throw new NotFoundException(`BookingDetail with ID ${id} not found`);
     }
     return bookingDetail;
   }
 
-  async update(id: string, updateBookingDetailDto: UpdateBookingDetailDto): Promise<BookingDetail> {
+  async update(id: string, updateBookingDetailDto: any): Promise<BookingDetail> {
     await this.bookingDetailsRepository.update(id, updateBookingDetailDto);
     return this.findOne(id);
   }

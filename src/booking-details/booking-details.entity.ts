@@ -81,21 +81,6 @@ export class BookingDetail {
   ownerId: string;
 
   @ApiProperty({
-    description: 'Time slot associated with this detail',
-    type: () => TimeSlot,
-  })
-  @ManyToOne(() => TimeSlot, timeSlot => timeSlot.bookingDetails)
-  @JoinColumn({ name: 'time_slot_id' }) // Join column for timeSlotId
-  timeSlot: TimeSlot;
-
-  @ApiProperty({
-    description: 'Time slot ID for this detail',
-    example: 'uuid',
-  })
-  @Column({ name: 'time_slot_id' })
-  timeSlotId: string;
-
-  @ApiProperty({
     description: 'Duration of the booking in hours',
     example: 1.5,
   })
@@ -128,36 +113,48 @@ export class BookingDetail {
   @ApiProperty({
     description: 'bookingMonth: 5',
     example: "5",
-    nullable: true,
   })
   @Column({
     name: 'booking_month',
+    nullable: true,
   })
   bookingMonth?: string;
 
   @ApiProperty({
     description: 'The date when the court is booked',
     example: '2024-08-28',
-    nullable: true,
+
   })
-  @Column({ name: "booking_date" })
+  @Column({ name: "booking_date", nullable: true, })
   bookingDate: string;
 
   @ApiProperty({
     description: 'The end time for the booking detail',
     example: '10:30',
-    nullable: true,
+
   })
-  @Column({ name: "start_time" })
+  @Column({ name: "start_time", nullable: true, })
   startTime: string;
 
   @ApiProperty({
     description: 'The start time for the booking detail',
     example: '11:00',
+
+  })
+  @Column({ name: "end_time", nullable: true, })
+  endTime: string;
+
+  @ApiProperty({
+    description: 'Indicates whether the user has reported an absence for this session',
+    example: false,
+  })
+  @Column({
+    name: 'is_absent',
+    type: 'boolean',
+    default: false,
     nullable: true,
   })
-  @Column({ name: "end_time" })
-  endTime: string;
+  isAbsent: boolean;
 
   @ApiProperty({
     description: 'The total amount for the booking detail',

@@ -18,13 +18,13 @@ export class CreateCustomerDto {
   @IsNotEmpty()
   phoneNumber: string;
 
-  @ApiProperty({
-    description: 'Email address of the customer',
-    example: 'johndoe@example.com',
-  })
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  // @ApiProperty({
+  //   description: 'Email address of the customer',
+  //   example: 'johndoe@example.com',
+  // })
+  // @IsEmail()
+  // @IsOptional()
+  // email: string;
 
   @ApiProperty({
     description: 'Additional notes about the customer',

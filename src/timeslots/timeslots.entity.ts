@@ -78,11 +78,4 @@ export class TimeSlot {
   @JoinColumn({ name: 'court_id' })
   court: Court;
 
-  @ApiProperty({
-    description: 'List of booking details associated with this time slot',
-    type: () => [BookingDetail],
-  })
-  @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.timeSlot)
-  bookingDetails: BookingDetail[];
-
 }

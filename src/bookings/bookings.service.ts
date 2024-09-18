@@ -8,19 +8,20 @@ import { Customer } from 'src/customers/customers.entity';
 import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Voucher } from 'src/vouchers/vouchers.entity';
+import { Court } from 'src/courts/courts.entity';
 
 @Injectable()
 export class BookingsService {
   constructor(
     @InjectRepository(Booking)
     private bookingsRepository: Repository<Booking>,
+    @InjectRepository(Court)
+    private courtsRepository: Repository<Court>,
     @InjectRepository(Customer)
     private readonly customersRepository: Repository<Customer>,
 
     @InjectRepository(BookingDetail)
     private readonly bookingDetailsRepository: Repository<BookingDetail>,
-    @InjectRepository(TimeSlot)
-    private readonly timeSlotRepository: Repository<TimeSlot>,
 
     @InjectRepository(Voucher)
     private vouchersRepository: Repository<Voucher>,
@@ -56,18 +57,27 @@ export class BookingsService {
       // Calculate the total amount based on booking details
       let totalAmount = 0;
 
+      const court = await this.courtsRepository.findOne({
+        where: {
+          id: bookingData.courtId
+        }
+      });
+
+      if (!court) {
+        throw new NotFoundException(`Court with ID "${bookingData.courtId}" not found`);
+      }
+
       if (bookingDetails && bookingDetails.length > 0) {
         const bookingDetailsEntities = await Promise.all(
           bookingDetails.map(async (detail) => {
-            const timeSlot = await this.timeSlotRepository.findOne({ where: { id: detail.timeSlotId } });
 
             let bookingAmount = 0;
 
             // Calculate the booking amount based on the booking type
             if (detail.bookingType === BookingType.WALK_IN) {
-              bookingAmount = timeSlot.walkInFee * detail.duration;
+              bookingAmount = Number(court.walkInFee || 0) * Number(detail.duration || 0);
             } else if (detail.bookingType === BookingType.SCHEDULED) {
-              bookingAmount = timeSlot.fixedFee * detail.duration;
+              bookingAmount = Number(court.fixedFee || 0) * Number(detail.duration || 0);
             }
 
             totalAmount += bookingAmount;
@@ -127,7 +137,7 @@ export class BookingsService {
       // Return the fully populated booking entity
       return this.bookingsRepository.findOne({
         where: { id: savedBooking.id },
-        relations: ['customer', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+        relations: ['customer', 'bookingDetails', 'bookingDetails.position', 'payments'],
       });
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -143,7 +153,7 @@ export class BookingsService {
           { finalAmount: IsNull() },
           { discountInfo: IsNull() },
         ],
-        relations: ['bookingDetails', 'customer', 'bookingDetails.timeSlot'],
+        relations: ['bookingDetails', 'customer'],
       });
 
       for (const booking of bookingsToUpdate) {
@@ -153,9 +163,14 @@ export class BookingsService {
 
         // Recalculate totalAmount based on bookingDetails
         for (const detail of booking.bookingDetails) {
+          const court = await this.courtsRepository.findOne({
+            where: {
+              id: detail.courtId
+            }
+          });
           const bookingAmount = detail.bookingType === BookingType.WALK_IN
-            ? detail.timeSlot.walkInFee * detail.duration
-            : detail.timeSlot.fixedFee * detail.duration;
+            ? court.walkInFee * detail.duration
+            : court.fixedFee * detail.duration;
 
           totalAmount += bookingAmount;
         }
@@ -220,13 +235,13 @@ export class BookingsService {
         order: { [sortBy]: sortOrder },
         skip: (page - 1) * limit,
         take: limit,
-        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'payments'],
       });
     } else {
       data = await this.bookingsRepository.find({
         where,
         order: { [sortBy]: sortOrder },
-        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+        relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'payments'],
       });
       total = data.length;
     }
@@ -238,7 +253,7 @@ export class BookingsService {
   async findOne(id: string): Promise<Booking> {
     const booking = await this.bookingsRepository.findOne({
       where: { id },
-      relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'bookingDetails.timeSlot', 'payments'],
+      relations: ['customer', 'court', 'bookingDetails', 'bookingDetails.position', 'payments'],
     });
     if (!booking) {
       throw new NotFoundException(`Booking with ID "${id}" not found`);

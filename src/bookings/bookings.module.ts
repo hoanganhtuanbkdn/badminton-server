@@ -7,9 +7,10 @@ import { Customer } from 'src/customers/customers.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Voucher } from 'src/vouchers/vouchers.entity';
+import { Court } from 'src/courts/courts.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Booking, Customer, BookingDetail, TimeSlot, Voucher])],
+  imports: [TypeOrmModule.forFeature([Booking, Customer, BookingDetail, TimeSlot, Voucher, Court])],
   providers: [BookingsService],
   controllers: [BookingsController],
 })
