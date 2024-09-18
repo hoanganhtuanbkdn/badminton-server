@@ -59,14 +59,14 @@ export class Booking {
     description: 'Payment method of the booking: Tiền mặt, chuyển khoản',
     // example: 'Paid',
   })
-  @Column({ name: 'payment_method' })
+  @Column({ name: 'payment_method', nullable: true, })
   paymentMethod: string;
 
   @ApiProperty({
     description: 'Payment type of the booking: Cọc trước 50%, trả trước 100%, trả sau',
     example: 'Paid',
   })
-  @Column({ name: 'payment_type' })
+  @Column({ name: 'payment_type', nullable: true, })
   paymentType: string;
 
   @ApiProperty({
