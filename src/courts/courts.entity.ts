@@ -1,11 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn, BeforeInsert } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 import { Owner } from 'src/owners/owners.entity';
 import { Position } from 'src/positions/positions.entity';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Booking } from 'src/bookings/bookings.entity';
-import { ApiProperty } from '@nestjs/swagger';
-import { slugify } from 'src/shared/utils';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
+import { slugify } from 'src/shared/utils';
 
 @Entity('courts')
 export class Court {
@@ -34,12 +34,26 @@ export class Court {
   address: string;
 
   @ApiProperty({
-    description: 'Geographical coordinates of the court (nullable)',
-    example: '40.7128,-74.0060',
-    required: false,
+    description: 'Latitude of the court',
+    example: 21.028511,
   })
-  @Column({ name: 'coordinate', nullable: true })
-  coordinate?: string;
+  @Column('decimal', { precision: 10, scale: 8, nullable: true })
+  latitude: number;
+
+  @ApiProperty({
+    description: 'Longitude of the court',
+    example: 105.804817,
+  })
+  @Column('decimal', { precision: 11, scale: 8, nullable: true })
+  longitude: number;
+
+  @ApiProperty({
+    description: 'Distance to the court',
+    example: 1000,
+    nullable: true,
+  })
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  distance?: number;
 
   @ApiProperty({
     description: 'Phone number for contact (nullable)',
@@ -57,8 +71,75 @@ export class Court {
   @Column({ name: 'banner_url', nullable: true })
   bannerUrl?: string;
 
-  @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.court)
-  bookingDetails: BookingDetail[];
+  @ApiProperty({
+    description: 'Banner image URL for the court (nullable)',
+    example: 'https://example.com/banner.jpg',
+    required: false,
+  })
+  @Column({ name: 'logo_url', nullable: true })
+  logoUrl?: string;
+
+  @ApiProperty({
+    description: 'duration',
+    example: 1,
+  })
+  @Column({
+    type: 'decimal',
+    precision: 3,
+    scale: 1,
+    nullable: true,
+    default: 0.5
+  })
+  duration: number;
+
+  @ApiProperty({
+    description: 'Fixed fee for booking during weekdays',
+    example: 100000,
+  })
+  @Column({ name: 'fixed_fee', nullable: true, default: 0 })
+  fixedFee: number;
+
+  @ApiProperty({
+    description: 'Walk-in fee for booking during weekdays',
+    example: 150000,
+  })
+  @Column({ name: 'walk_in_fee', nullable: true, default: 0 })
+  walkInFee: number;
+
+  @ApiProperty({
+    description: 'Fixed fee for booking during weekends',
+    example: 120000,
+  })
+  @Column({ name: 'weekend_fixed_fee', nullable: true, default: 0 })
+  weekendFixedFee: number;
+
+  @ApiProperty({
+    description: 'Walk-in fee for booking during weekends',
+    example: 180000,
+  })
+  @Column({ name: 'weekend_walk_in_fee', nullable: true, default: 0 })
+  weekendWalkInFee: number;
+
+  @ApiProperty({
+    description: 'Fixed fee for booking during evening hours',
+    example: 130000,
+  })
+  @Column({ name: 'evening_fixed_fee', nullable: true, default: 0 })
+  eveningFixedFee: number;
+
+  @ApiProperty({
+    description: 'Walk-in fee for booking during evening hours',
+    example: 200000,
+  })
+  @Column({ name: 'evening_walk_in_fee', nullable: true, default: 0 })
+  eveningWalkInFee: number;
+
+  @ApiProperty({
+    description: 'Owner ID of the court',
+    example: 'uuid',
+  })
+  @Column({ name: 'owner_id' })
+  ownerId: string;
 
   @ApiProperty({
     description: 'Date when the court was created',
@@ -72,13 +153,6 @@ export class Court {
   })
   @UpdateDateColumn({ name: 'updated_at', nullable: true })
   updatedAt: Date;
-
-  @ApiProperty({
-    description: 'Owner ID of the court',
-    example: 'uuid',
-  })
-  @Column({ name: 'owner_id' })
-  ownerId: string;
 
   @ApiProperty({
     description: 'Owner of the court',
@@ -96,33 +170,6 @@ export class Court {
   positions: Position[];
 
   @ApiProperty({
-    description: 'duration',
-    example: 1,
-  })
-  @Column({
-    type: 'decimal',
-    precision: 3,
-    scale: 1,
-    nullable: true,
-    default: 0.5
-  })
-  duration: number;
-
-  @ApiProperty({
-    description: 'Fixed fee for booking during this time slot',
-    example: 100000,
-  })
-  @Column({ name: 'fixed_fee', nullable: true, default: 0 })
-  fixedFee: number;
-
-  @ApiProperty({
-    description: 'Walk-in fee for booking during this time slot',
-    example: 150000,
-  })
-  @Column({ name: 'walk_in_fee', nullable: true, default: 0 })
-  walkInFee: number;
-
-  @ApiProperty({
     description: 'List of time slots associated with this court',
     type: () => [TimeSlot],
   })
@@ -135,6 +182,9 @@ export class Court {
   })
   @OneToMany(() => Booking, booking => booking.court)
   bookings: Booking[];
+
+  @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.court)
+  bookingDetails: BookingDetail[];
 
   @BeforeInsert()
   generateSlug() {

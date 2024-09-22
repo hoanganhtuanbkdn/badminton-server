@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Position } from './positions.entity';
 import { CreatePositionDto, UpdatePositionDto, GetPositionsDto } from './dto';
 import { Court } from 'src/courts/courts.entity';
+import { BookingDetail } from 'src/booking-details/booking-details.entity';
 
 @Injectable()
 export class PositionsService {
@@ -80,6 +81,35 @@ export class PositionsService {
     const result = await this.positionsRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Position with ID ${id} not found`);
+    }
+  }
+
+  async findAvailablePositions(courtId: string, startTime: string, duration: number, bookingDate: Date): Promise<Position[]> {
+    try {
+      const endTime = new Date(`${bookingDate.toISOString().split('T')[0]}T${startTime}`);
+      endTime.setMinutes(endTime.getMinutes() + Number(duration));
+
+      console.log(startTime, duration, bookingDate);
+      const positions = await this.positionsRepository.createQueryBuilder('position')
+        .leftJoinAndSelect('position.bookingDetails', 'bookingDetail')
+        .where('position.courtId = :courtId', { courtId })
+        .andWhere(qb => {
+          const subQuery = qb.subQuery()
+            .select('1')
+            .from(BookingDetail, 'bd')
+            .where('bd.positionId = position.id')
+            .andWhere('bd.bookingDate = :bookingDate', { bookingDate })
+            .andWhere('(bd.startTime < :endTime AND bd.endTime > :startTime)', { startTime, endTime: endTime.toTimeString().slice(0, 5) })
+            .getQuery();
+          return 'NOT EXISTS (' + subQuery + ')';
+        })
+        .getMany();
+
+      console.log(positions);
+      return positions;
+    } catch (error) {
+      console.error('Error in findAvailablePositions:', error);
+      return [];
     }
   }
 }

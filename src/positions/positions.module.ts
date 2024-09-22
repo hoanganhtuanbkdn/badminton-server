@@ -9,5 +9,6 @@ import { Court } from 'src/courts/courts.entity';
   imports: [TypeOrmModule.forFeature([Position, Court])],
   providers: [PositionsService],
   controllers: [PositionsController],
+  exports: [PositionsService],
 })
 export class PositionsModule { }
