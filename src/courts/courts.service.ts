@@ -63,7 +63,6 @@ export class CourtsService {
       limit = 10
     } = searchDto;
 
-    console.log(searchDto);
     try {
       let query = this.courtsRepository.createQueryBuilder('court');
 
@@ -88,6 +87,7 @@ export class CourtsService {
         let courtWithDetails = {
           ...court,
           availablePositionsCount: availablePositions.length,
+          availablePositions
         };
 
         if (latitude && longitude && court.latitude && court.longitude) {
