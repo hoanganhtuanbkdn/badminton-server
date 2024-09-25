@@ -4,6 +4,7 @@ import { CreateCourtDto, UpdateCourtDto, GetCourtsDto } from './dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiQuery, getSchemaPath } from '@nestjs/swagger';
 import { Court } from './courts.entity';
 import { SearchCourtsByLocationDto } from './dto/search-courts-by-location.dto';
+import { Position } from 'src/positions/positions.entity';
 @ApiTags('courts')
 @Controller('courts')
 export class CourtsController {
@@ -54,6 +55,7 @@ export class CourtsController {
               {
                 type: 'object',
                 properties: {
+                  availablePositions: { type: 'array', items: { $ref: getSchemaPath(Position) } },
                   availablePositionsCount: { type: 'number', description: 'Number of available positions' },
                   distanceInMeters: { type: 'number', description: 'Distance to the court in meters' },
                   formattedDistance: { type: 'string', description: 'Formatted distance to the court' },
@@ -95,15 +97,24 @@ export class CourtsController {
         {
           type: 'object',
           properties: {
-            distance: { type: 'number', description: 'Distance to the court in meters', nullable: true },
-            distanceWithUnit: { type: 'string', description: 'Distance to the court with unit', nullable: true },
+            availablePositionsCount: { type: 'number', description: 'Number of available positions' },
+            availablePositions: { type: 'array', items: { $ref: getSchemaPath(Position) } },
+            distanceInMeters: { type: 'number', description: 'Distance to the court in meters' },
+            formattedDistance: { type: 'string', description: 'Formatted distance to the court' },
           },
         },
       ],
     },
   })
   @ApiResponse({ status: 404, description: 'Court not found' })
-  findOne(@Param('id') id: string, @Query('latitude') latitude?: number, @Query('longitude') longitude?: number) {
+  findOne(
+    @Param('id') id: string,
+    @Query('latitude') latitude?: number,
+    @Query('longitude') longitude?: number,
+    @Query('bookingDate') bookingDate?: Date,
+    @Query('startTime') startTime?: string,
+    @Query('duration') duration?: number
+  ) {
     return this.courtsService.findOne(id, latitude, longitude);
   }
 
