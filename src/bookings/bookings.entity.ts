@@ -73,7 +73,7 @@ export class Booking {
     description: 'Payment status of the booking',
     example: 'Paid',
   })
-  @Column({ name: 'payment_status' })
+  @Column({ name: 'payment_status', nullable: true })
   paymentStatus: string;
 
   @ApiProperty({
