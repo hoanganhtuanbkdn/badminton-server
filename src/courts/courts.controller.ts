@@ -86,8 +86,11 @@ export class CourtsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a court by ID' })
   @ApiParam({ name: 'id', description: 'Court ID' })
-  @ApiQuery({ name: 'latitude', required: false, type: Number, description: 'Latitude of the client' })
-  @ApiQuery({ name: 'longitude', required: false, type: Number, description: 'Longitude of the client' })
+  @ApiQuery({ name: 'latitude', type: Number, description: 'Latitude of the client' })
+  @ApiQuery({ name: 'longitude', type: Number, description: 'Longitude of the client' })
+  @ApiQuery({ name: 'bookingDate', type: Date, description: 'Date for booking (e.g., 2023-06-01)' })
+  @ApiQuery({ name: 'startTime', type: String, description: 'Start time for booking (HH:mm) (e.g., 14:00)' })
+  @ApiQuery({ name: 'duration', type: Number, description: 'Duration of booking in minutes (e.g., 60)' })
   @ApiResponse({
     status: 200,
     description: 'Returns the court with the specified ID',
@@ -115,7 +118,7 @@ export class CourtsController {
     @Query('startTime') startTime?: string,
     @Query('duration') duration?: number
   ) {
-    return this.courtsService.findOne(id, latitude, longitude);
+    return this.courtsService.findOne(id, latitude, longitude, bookingDate, startTime, duration);
   }
 
   @Patch(':id')

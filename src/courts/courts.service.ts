@@ -54,9 +54,9 @@ export class CourtsService {
       latitude,
       longitude,
       radius,
-      bookingDate = now,
-      startTime = now.toTimeString().slice(0, 5),
-      duration = 120,
+      bookingDate,
+      startTime,
+      duration,
       numberOfCourts,
       page = 1,
       limit = 10
@@ -139,11 +139,9 @@ export class CourtsService {
 
     let result: any = { ...court };
 
-    if (bookingDate && startTime && duration) {
-      const availablePositions = await this.positionsService.findAvailablePositions(court.id, startTime, duration, bookingDate);
-      result.availablePositionsCount = availablePositions.length;
-      result.availablePositions = availablePositions;
-    }
+    const availablePositions = await this.positionsService.findAvailablePositions(court.id, startTime, duration, bookingDate);
+    result.availablePositionsCount = availablePositions.length;
+    result.availablePositions = availablePositions;
 
     if (latitude && longitude && court.latitude && court.longitude) {
       const earthRadius = 6371; // Earth's radius in km
