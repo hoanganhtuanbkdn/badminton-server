@@ -13,7 +13,7 @@ services:
     volumes:
       - ./src:/app/src
     env_file:
-      - .env.${APP_ENV}
+      - .env
     environment:
       APP_ENV: ${APP_ENV}
       APP_PORT: ${APP_PORT}
@@ -34,7 +34,7 @@ services:
     container_name: badminton_website_pgsqldb_${APP_ENV}
     image: postgres:14.3
     env_file:
-      - .env.${APP_ENV}
+      - .env
     environment:
       POSTGRES_USER: '${DB_USER}'
       POSTGRES_PASSWORD: '${DB_PASS}'
