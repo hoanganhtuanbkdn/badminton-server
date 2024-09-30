@@ -23,6 +23,8 @@ services:
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       NODE_OPTIONS: --max-old-space-size=4096
+      VIRTUAL_HOST: courtapi.bstar-badminton.com
+      LETSENCRYPT_HOST: courtapi.bstar-badminton.com
     depends_on:
       - pgsqldb
       - redis
