@@ -2,18 +2,18 @@ version: '3.8'
 
 services:
   app:
-    container_name: pacific_app_website
-    image: pacific_app_website-api-dev:1.0.0
+    container_name: badminton_website_${APP_ENV}
+    image: badminton_website-api-${APP_ENV}:1.0.0
     build:
       context: .
       dockerfile: ./Dockerfile
     command: npm run start
     ports:
-      - 8000:8000
+      - '${APP_PORT}:8000'
     volumes:
       - ./src:/app/src
     env_file:
-      - .env
+      - .env.${APP_ENV}
     environment:
       APP_ENV: ${APP_ENV}
       APP_PORT: ${APP_PORT}
@@ -29,32 +29,32 @@ services:
     restart: unless-stopped
 
   pgsqldb:
-    container_name: pacific_app_website_pgsqldb
+    container_name: badminton_website_pgsqldb_${APP_ENV}
     image: postgres:14.3
     env_file:
-      - .env
+      - .env.${APP_ENV}
     environment:
       POSTGRES_USER: '${DB_USER}'
       POSTGRES_PASSWORD: '${DB_PASS}'
       POSTGRES_DB: '${DB_NAME}'
     ports:
-      - 5432:5432
+      - '${DB_PORT}:5432'
     volumes:
-      - pacific_app_website_pgsqldata:/var/lib/postgresql/data
+      - badminton_website_pgsqldata_${APP_ENV}:/var/lib/postgresql/data
 
   redis:
-    container_name: pacific_app_website_redis
+    container_name: badminton_website_redis_${APP_ENV}
     restart: always
     image: redis:6.0-alpine
     ports:
-      - '6379:6379'
+      - '${REDIS_PORT}:6379'
     volumes:
-      - pacific_app_website_redis_data:/data
+      - badminton_website_redis_data_${APP_ENV}:/data
 
 volumes:
-  pacific_app_website_redis_data:
-  pacific_app_website_pgsqldata:
+  badminton_website_redis_data_${APP_ENV}:
+  badminton_website_pgsqldata_${APP_ENV}:
 
 networks:
   default:
-    name: myapp
+    name: ${APP_ENV}
