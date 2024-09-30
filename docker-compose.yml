@@ -52,8 +52,8 @@ services:
       - redisdata:/data
 
 volumes:
-  badminton_website_redis_data_${APP_ENV}:
-  badminton_website_pgsqldata_${APP_ENV}:
+  pgsqldata:
+  redisdata:
 
 networks:
   default:
