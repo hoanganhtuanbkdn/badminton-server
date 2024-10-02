@@ -11,7 +11,7 @@ export class VouchersService {
     private vouchersRepository: Repository<Voucher>,
   ) { }
 
-  create(createVoucherDto: CreateVoucherDto): Promise<Voucher> {
+  create(createVoucherDto: any) {
     const voucher = this.vouchersRepository.create(createVoucherDto);
     return this.vouchersRepository.save(voucher);
   }

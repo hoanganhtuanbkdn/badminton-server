@@ -13,7 +13,7 @@ export class VouchersController {
   @ApiResponse({ status: 400, description: 'Invalid input data.' })
   @ApiBody({ type: CreateVoucherDto })
   @Post()
-  create(@Body() createVoucherDto: CreateVoucherDto) {
+  create(@Body() createVoucherDto: any) {
     return this.vouchersService.create(createVoucherDto);
   }
 
