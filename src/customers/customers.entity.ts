@@ -16,21 +16,21 @@ export class Customer {
     description: 'Name of the customer',
     example: 'John Doe',
   })
-  @Column({ name: 'name' })
+  @Column({ name: 'name', nullable: true })
   name: string;
 
   @ApiProperty({
     description: 'Phone number of the customer',
     example: '+1234567890',
   })
-  @Column({ name: 'phone_number' })
+  @Column({ name: 'phone_number', nullable: true })
   phoneNumber: string;
 
   @ApiProperty({
     description: 'Email address of the customer',
     example: 'johndoe@example.com',
   })
-  @Column({ name: 'email' })
+  @Column({ name: 'email', nullable: true })
   email: string;
 
   @ApiProperty({
