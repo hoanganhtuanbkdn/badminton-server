@@ -6,6 +6,7 @@ import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Booking } from 'src/bookings/bookings.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { slugify } from 'src/shared/utils';
+import { Product } from 'src/products/products.entity';
 
 @Entity('courts')
 export class Court {
@@ -185,6 +186,9 @@ export class Court {
 
   @OneToMany(() => BookingDetail, bookingDetail => bookingDetail.court)
   bookingDetails: BookingDetail[];
+
+  @OneToMany(() => Product, product => product.court)
+  products: Product[];
 
   @BeforeInsert()
   generateSlug() {

@@ -20,6 +20,9 @@ import { BookingsModule } from './bookings/bookings.module';
 import { BookingDetailsModule } from './booking-details/booking-details.module';
 import { PaymentsModule } from './payments/payments.module';
 import { VouchersModule } from './vouchers/vouchers.module';
+import { OrdersModule } from './orders/orders.module';
+import { ProductsModule } from './products/products.module';
+import { ProductCategoriesModule } from './product-categories/product-categories.module';
 
 @Module({
   imports: [
@@ -45,6 +48,9 @@ import { VouchersModule } from './vouchers/vouchers.module';
     BookingDetailsModule,
     PaymentsModule,
     VouchersModule,
+    OrdersModule,
+    ProductsModule,
+    ProductCategoriesModule
   ],
   controllers: [AppController],
   providers: [
