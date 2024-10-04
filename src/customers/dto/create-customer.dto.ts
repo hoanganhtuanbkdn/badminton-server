@@ -7,7 +7,7 @@ export class CreateCustomerDto {
     example: 'John Doe',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @ApiProperty({
@@ -15,7 +15,7 @@ export class CreateCustomerDto {
     example: '+1234567890',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   phoneNumber: string;
 
   // @ApiProperty({

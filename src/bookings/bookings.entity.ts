@@ -4,6 +4,7 @@ import { Court } from 'src/courts/courts.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { Payment } from 'src/payments/payments.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Order } from 'src/orders/orders.entity';
 
 export enum BookingMode {
   BOOK_COURT = 'BOOK_COURT',  // Đặt sân
@@ -151,4 +152,7 @@ export class Booking {
   })
   @OneToMany(() => Payment, payment => payment.booking)
   payments: Payment[];
+
+  @OneToMany(() => Order, order => order.booking)
+  orders: Order[];
 }
