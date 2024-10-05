@@ -36,6 +36,7 @@ export class OrdersService {
         bookingDetailId: createOrderDto.bookingDetailId,
         status: createOrderDto.status,
         paymentMethod: createOrderDto.paymentMethod,
+        orderCode: createOrderDto.orderCode,
         totalAmount: createOrderDto.totalAmount,
       });
       const savedOrder = await queryRunner.manager.save(order);

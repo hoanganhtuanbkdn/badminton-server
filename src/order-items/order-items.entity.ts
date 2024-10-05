@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Order } from '../orders/orders.entity';
 import { Product } from '../products/products.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -55,4 +55,12 @@ export class OrderItem {
   @ApiProperty({ description: 'Additional notes for the order item', nullable: true, example: 'Special instructions' })
   @Column({ nullable: true })
   notes: string;
+
+  @ApiProperty({ description: 'Created at', example: '2024-01-01T00:00:00Z' })
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @ApiProperty({ description: 'Updated at', example: '2024-01-01T00:00:00Z' })
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

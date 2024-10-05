@@ -4,15 +4,13 @@ import { OrderItem } from '../order-items/order-items.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum OrderStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  CANCELLED = 'cancelled'
+  PAID = 'PAID',
+  UNPAID = 'UNPAID'
 }
 
 export enum PaymentMethod {
-  CASH = 'cash',
-  CREDIT_CARD = 'credit_card',
-  BANK_TRANSFER = 'bank_transfer'
+  CASH = 'CASH',
+  TRANSFER = 'TRANSFER'
 }
 
 @Entity('orders')
@@ -38,20 +36,22 @@ export class Order {
   @OneToMany(() => OrderItem, orderItem => orderItem.order)
   orderItems: OrderItem[];
 
-  @ApiProperty({ description: 'The status of the order', enum: OrderStatus })
+  @ApiProperty({ description: 'Payment status of the order', enum: ['PAID', 'UNPAID'], example: 'UNPAID' })
   @Column({
     type: 'enum',
-    enum: OrderStatus,
-    default: OrderStatus.PENDING
+    enum: ['PAID', 'UNPAID'],
+    default: 'UNPAID',
+    nullable: true
   })
-  status: OrderStatus;
+  status: string;
 
-  @ApiProperty({ description: 'The payment method for the order', enum: PaymentMethod })
+  @ApiProperty({ description: 'Payment method for the order', enum: ['TRANSFER', 'CASH'], nullable: true, example: 'TRANSFER' })
   @Column({
     type: 'enum',
-    enum: PaymentMethod
+    enum: ['TRANSFER', 'CASH'],
+    nullable: true
   })
-  paymentMethod: PaymentMethod;
+  paymentMethod: string;
 
   @ApiProperty({ description: 'The total amount of the order' })
   @Column('decimal', { precision: 10, scale: 2 })

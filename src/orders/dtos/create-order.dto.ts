@@ -21,6 +21,12 @@ export class CreateOrderDto {
   @IsNotEmpty()
   bookingDetailId: string;
 
+
+  @ApiProperty({ description: 'The Order code of the order' })
+  @IsString()
+  @IsNotEmpty()
+  orderCode: string;
+
   @ApiProperty({ description: 'The status of the order', enum: OrderStatus })
   @IsEnum(OrderStatus)
   status: OrderStatus;
