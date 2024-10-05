@@ -21,6 +21,10 @@ export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty({ description: 'The order code' })
+  @Column({ unique: true })
+  orderCode: string;
+
   @ApiProperty({ description: 'The ID of the booking detail associated with this order' })
   @Column({ name: 'booking_detail_id' })
   bookingDetailId: string;
