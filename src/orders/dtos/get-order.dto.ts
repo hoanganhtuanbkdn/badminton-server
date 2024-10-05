@@ -25,8 +25,8 @@ export class GetOrderDto {
   @IsEnum(SortOrder)
   sortOrder?: SortOrder = SortOrder.DESC;
 
-  @ApiPropertyOptional({ description: 'Filter by booking ID' })
+  @ApiPropertyOptional({ description: 'Filter by booking detail ID' })
   @IsOptional()
   @IsString()
-  bookingId?: string;
+  bookingDetailId?: string;
 }

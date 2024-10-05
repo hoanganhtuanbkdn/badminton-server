@@ -16,10 +16,10 @@ class CreateOrderItemDto {
 }
 
 export class CreateOrderDto {
-  @ApiProperty({ description: 'The ID of the associated booking' })
+  @ApiProperty({ description: 'The ID of the associated booking detail' })
   @IsString()
   @IsNotEmpty()
-  bookingId: string;
+  bookingDetailId: string;
 
   @ApiProperty({ description: 'The status of the order', enum: OrderStatus })
   @IsEnum(OrderStatus)

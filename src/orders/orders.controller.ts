@@ -24,6 +24,7 @@ export class OrdersController {
   @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
   @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
+  @ApiQuery({ name: 'bookingDetailId', required: false, description: 'Filter by booking detail ID' })
   @ApiResponse({ status: 200, description: 'Return all orders with pagination, sorting, and filtering.', type: [Order] })
   findAll(@Query() getOrdersDto: GetOrderDto): Promise<{ data: Order[]; total: number; page?: number; limit?: number }> {
     return this.ordersService.findAll(getOrdersDto);
