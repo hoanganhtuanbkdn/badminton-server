@@ -57,4 +57,13 @@ export class OrdersController {
   remove(@Param('id') id: string): Promise<void> {
     return this.ordersService.remove(id);
   }
+
+  @Post(':id/confirm-payment')
+  @ApiOperation({ summary: 'Confirm payment for an order' })
+  @ApiParam({ name: 'id', description: 'ID of the order to confirm payment' })
+  @ApiResponse({ status: 200, description: 'The order payment has been successfully confirmed.', type: Order })
+  @ApiResponse({ status: 404, description: 'Order not found.' })
+  confirmPayment(@Param('id') id: string): Promise<Order> {
+    return this.ordersService.confirmPayment(id);
+  }
 }

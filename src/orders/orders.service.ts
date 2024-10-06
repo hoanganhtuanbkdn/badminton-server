@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Order } from './orders.entity';
+import { Order, OrderStatus } from './orders.entity';
 import { OrderItem } from '../order-items/order-items.entity';
 import { Product } from '../products/products.entity';
 import { BookingDetail } from '../booking-details/booking-details.entity';
@@ -169,6 +169,46 @@ export class OrdersService {
       await queryRunner.manager.remove(order);
 
       await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async confirmPayment(id: string): Promise<Order> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const order = await this.ordersRepository.findOne({
+        where: { id },
+        relations: ['orderItems'],
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with ID "${id}" not found`);
+      }
+
+      if (order.status === OrderStatus.PAID) {
+        throw new BadRequestException(`Order with ID "${id}" is already paid`);
+      }
+
+      // Update order status
+      order.status = OrderStatus.PAID;
+      await queryRunner.manager.save(order);
+
+      // Update all associated order items status
+      for (const orderItem of order.orderItems) {
+        orderItem.status = OrderStatus.PAID;
+        await queryRunner.manager.save(orderItem);
+      }
+
+      await queryRunner.commitTransaction();
+
+      return order;
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
