@@ -1,15 +1,19 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository } from 'typeorm';
+import { Brackets, Repository, DataSource } from 'typeorm';
 import { BookingDetail } from './booking-details.entity';
 import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
 import { OverviewPeriod } from './dto/get-dashboard-overview.dto';
+import { Order } from '../orders/orders.entity';
 
 @Injectable()
 export class BookingDetailsService {
   constructor(
     @InjectRepository(BookingDetail)
     private bookingDetailsRepository: Repository<BookingDetail>,
+    @InjectRepository(Order)
+    private ordersRepository: Repository<Order>,
+    private dataSource: DataSource,
   ) { }
 
   async create(createBookingDetailDto: CreateBookingDetailDto): Promise<BookingDetail> {
@@ -130,6 +134,7 @@ export class BookingDetailsService {
       unpaidCount: overviewData?.unpaidcount,
     };
   }
+
   async findOne(id: string): Promise<BookingDetail> {
     const bookingDetail = await this.bookingDetailsRepository.findOne({
       where: { id },
@@ -147,9 +152,34 @@ export class BookingDetailsService {
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.bookingDetailsRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`BookingDetail with ID ${id} not found`);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const bookingDetail = await this.bookingDetailsRepository.findOne({
+        where: { id },
+        relations: ['orders'],
+      });
+
+      if (!bookingDetail) {
+        throw new NotFoundException(`BookingDetail with ID ${id} not found`);
+      }
+
+      // Delete related orders
+      if (bookingDetail.orders && bookingDetail.orders.length > 0) {
+        await queryRunner.manager.remove(bookingDetail.orders);
+      }
+
+      // Delete the booking detail
+      await queryRunner.manager.remove(bookingDetail);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new BadRequestException(`Failed to delete BookingDetail: ${error.message}`);
+    } finally {
+      await queryRunner.release();
     }
   }
 }
