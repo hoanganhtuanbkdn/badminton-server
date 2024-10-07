@@ -83,4 +83,46 @@ export class OrderItemsService {
       throw new NotFoundException(`Order item with ID "${id}" not found`);
     }
   }
+
+  async addOrderItems(orderId: string, createOrderItemDtos: CreateOrderItemDto[]): Promise<OrderItem[]> {
+    const order = await this.ordersRepository.findOne({ where: { id: orderId } });
+    if (!order) {
+      throw new NotFoundException(`Order with ID "${orderId}" not found`);
+    }
+
+    const newOrderItems = await Promise.all(createOrderItemDtos.map(async (dto) => {
+      const product = await this.productsRepository.findOne({ where: { id: dto.productId } });
+      if (!product) {
+        throw new NotFoundException(`Product with ID "${dto.productId}" not found`);
+      }
+
+      const orderItem = this.orderItemsRepository.create({
+        ...dto,
+        orderId,
+        price: product.price * dto.quantity,
+      });
+
+      return this.orderItemsRepository.save(orderItem);
+    }));
+
+    // Update the total amount of the order
+    const totalAmount = newOrderItems.reduce((sum, item) => sum + item.price, 0);
+    order.totalAmount += totalAmount;
+    await this.ordersRepository.save(order);
+
+    return newOrderItems;
+  }
+
+  async findOne(id: string): Promise<OrderItem> {
+    const orderItem = await this.orderItemsRepository.findOne({
+      where: { id },
+      relations: ['product', 'order'],
+    });
+
+    if (!orderItem) {
+      throw new NotFoundException(`Order item with ID "${id}" not found`);
+    }
+
+    return orderItem;
+  }
 }
