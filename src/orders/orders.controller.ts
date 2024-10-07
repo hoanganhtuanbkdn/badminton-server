@@ -66,4 +66,13 @@ export class OrdersController {
   confirmPayment(@Param('id') id: string): Promise<Order> {
     return this.ordersService.confirmPayment(id);
   }
+
+  @Get('by-booking-detail/:bookingDetailId')
+  @ApiOperation({ summary: 'Get orders by booking detail ID' })
+  @ApiParam({ name: 'bookingDetailId', description: 'ID of the booking detail' })
+  @ApiResponse({ status: 200, description: 'Return the orders for the given booking detail ID.', type: [Order] })
+  @ApiResponse({ status: 404, description: 'No orders found for the given booking detail ID.' })
+  findByBookingDetailId(@Param('bookingDetailId') bookingDetailId: string): Promise<Order[]> {
+    return this.ordersService.findByBookingDetailId(bookingDetailId);
+  }
 }

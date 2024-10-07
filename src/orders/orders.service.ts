@@ -218,4 +218,17 @@ export class OrdersService {
       await queryRunner.release();
     }
   }
+
+  async findByBookingDetailId(bookingDetailId: string): Promise<Order[]> {
+    const orders = await this.ordersRepository.find({
+      where: { bookingDetailId },
+      relations: ['orderItems', 'orderItems.product', 'bookingDetail'],
+    });
+
+    if (!orders || orders.length === 0) {
+      throw new NotFoundException(`No orders found for booking detail ID "${bookingDetailId}"`);
+    }
+
+    return orders;
+  }
 }
