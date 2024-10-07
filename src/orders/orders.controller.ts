@@ -24,6 +24,7 @@ export class OrdersController {
   @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
   @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
+  @ApiQuery({ name: 'bookingDetailId', required: false, description: 'Filter by booking detail ID' })
   @ApiResponse({ status: 200, description: 'Return all orders with pagination, sorting, and filtering.', type: [Order] })
   findAll(@Query() getOrdersDto: GetOrderDto): Promise<{ data: Order[]; total: number; page?: number; limit?: number }> {
     return this.ordersService.findAll(getOrdersDto);
@@ -55,5 +56,14 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Order not found.' })
   remove(@Param('id') id: string): Promise<void> {
     return this.ordersService.remove(id);
+  }
+
+  @Post(':id/confirm-payment')
+  @ApiOperation({ summary: 'Confirm payment for an order' })
+  @ApiParam({ name: 'id', description: 'ID of the order to confirm payment' })
+  @ApiResponse({ status: 200, description: 'The order payment has been successfully confirmed.', type: Order })
+  @ApiResponse({ status: 404, description: 'Order not found.' })
+  confirmPayment(@Param('id') id: string): Promise<Order> {
+    return this.ordersService.confirmPayment(id);
   }
 }

@@ -8,6 +8,7 @@ export enum OverviewPeriod {
   THIS_MONTH = 'this_month',
   THIS_QUARTER = 'this_quarter',
   CUSTOM = 'custom',
+  ALL = 'all'
 }
 
 // DTO for getting dashboard overview

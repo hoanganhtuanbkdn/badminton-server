@@ -1,10 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Booking } from 'src/bookings/bookings.entity';
 import { Position } from 'src/positions/positions.entity';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Owner } from 'src/owners/owners.entity';
 import { Court } from 'src/courts/courts.entity';
+import { Order } from 'src/orders/orders.entity';
 
 export enum BookingType {
   WALK_IN = 'WALK_IN', // Vãng lai
@@ -168,4 +169,7 @@ export class BookingDetail {
 
   @UpdateDateColumn({ name: 'updated_at', nullable: true, default: "" })
   updatedAt: Date;
+
+  @OneToMany(() => Order, order => order.bookingDetail)
+  orders: Order[];
 }

@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Order } from './orders.entity';
+import { Order, OrderStatus } from './orders.entity';
+import { OrderItem } from '../order-items/order-items.entity';
+import { Product } from '../products/products.entity';
+import { BookingDetail } from '../booking-details/booking-details.entity';
 import { CreateOrderDto, UpdateOrderDto, GetOrderDto } from './dtos';
-import { OrderItem } from 'src/order-items/order-items.entity';
-import { Product } from 'src/products/products.entity';
 
 @Injectable()
 export class OrdersService {
@@ -15,6 +16,8 @@ export class OrdersService {
     private orderItemsRepository: Repository<OrderItem>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(BookingDetail)
+    private bookingDetailRepository: Repository<BookingDetail>,
     private dataSource: DataSource,
   ) { }
 
@@ -24,10 +27,16 @@ export class OrdersService {
     await queryRunner.startTransaction();
 
     try {
+      const bookingDetail = await this.bookingDetailRepository.findOne({ where: { id: createOrderDto.bookingDetailId } });
+      if (!bookingDetail) {
+        throw new NotFoundException(`BookingDetail with ID "${createOrderDto.bookingDetailId}" not found`);
+      }
+
       const order = this.ordersRepository.create({
-        bookingId: createOrderDto.bookingId,
+        bookingDetailId: createOrderDto.bookingDetailId,
         status: createOrderDto.status,
         paymentMethod: createOrderDto.paymentMethod,
+        orderCode: createOrderDto.orderCode,
         totalAmount: createOrderDto.totalAmount,
       });
       const savedOrder = await queryRunner.manager.save(order);
@@ -55,15 +64,20 @@ export class OrdersService {
     }
   }
 
-  async findAll(getOrdersDto: GetOrderDto): Promise<{ data: Order[]; total: number; page?: number; limit?: number }> {
-    const { page, limit, sortBy = 'createdAt', sortOrder = 'DESC', bookingId } = getOrdersDto;
+  async findAll(getOrderDto: GetOrderDto): Promise<{ data: Order[]; total: number; page?: number; limit?: number }> {
+    const { page, limit, sortBy = 'createdAt', sortOrder = 'DESC', bookingDetailId } = getOrderDto;
 
     const queryBuilder = this.ordersRepository.createQueryBuilder('order')
       .leftJoinAndSelect('order.orderItems', 'orderItems')
-      .leftJoinAndSelect('orderItems.product', 'product');
+      .leftJoinAndSelect('orderItems.product', 'product')
+      .leftJoinAndSelect('order.bookingDetail', 'bookingDetail')
+      .leftJoinAndSelect('bookingDetail.court', 'court')
+      .leftJoinAndSelect('bookingDetail.position', 'position')
+      .leftJoinAndSelect('bookingDetail.booking', 'booking')
+      .leftJoinAndSelect('booking.customer', 'customer');
 
-    if (bookingId) {
-      queryBuilder.andWhere('order.bookingId = :bookingId', { bookingId });
+    if (bookingDetailId) {
+      queryBuilder.andWhere('order.bookingDetailId = :bookingDetailId', { bookingDetailId });
     }
 
     queryBuilder.orderBy(`order.${sortBy}`, sortOrder);
@@ -74,11 +88,25 @@ export class OrdersService {
 
     const [data, total] = await queryBuilder.getManyAndCount();
 
-    return { data, total, page, limit };
+    // Transform the data to include nested objects
+    const transformedData = data.map(order => ({
+      ...order,
+      bookingDetail: {
+        ...order.bookingDetail,
+        court: order.bookingDetail.court,
+        position: order.bookingDetail.position,
+        owner: order.bookingDetail.owner
+      }
+    }));
+
+    return { data: transformedData, total, page, limit };
   }
 
   async findOne(id: string): Promise<Order> {
-    const order = await this.ordersRepository.findOne({ where: { id } });
+    const order = await this.ordersRepository.findOne({
+      where: { id },
+      relations: ['bookingDetail', 'orderItems', 'orderItems.product'],
+    });
     if (!order) {
       throw new NotFoundException(`Order with ID "${id}" not found`);
     }
@@ -127,7 +155,65 @@ export class OrdersService {
   }
 
   async remove(id: string): Promise<void> {
-    const order = await this.findOne(id);
-    await this.ordersRepository.remove(order);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const order = await this.findOne(id);
+
+      // Delete associated OrderItems
+      await queryRunner.manager.delete(OrderItem, { orderId: id });
+
+      // Delete the Order
+      await queryRunner.manager.remove(order);
+
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async confirmPayment(id: string): Promise<Order> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const order = await this.ordersRepository.findOne({
+        where: { id },
+        relations: ['orderItems'],
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with ID "${id}" not found`);
+      }
+
+      if (order.status === OrderStatus.PAID) {
+        throw new BadRequestException(`Order with ID "${id}" is already paid`);
+      }
+
+      // Update order status
+      order.status = OrderStatus.PAID;
+      await queryRunner.manager.save(order);
+
+      // Update all associated order items status
+      for (const orderItem of order.orderItems) {
+        orderItem.status = OrderStatus.PAID;
+        await queryRunner.manager.save(orderItem);
+      }
+
+      await queryRunner.commitTransaction();
+
+      return order;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

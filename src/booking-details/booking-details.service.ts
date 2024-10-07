@@ -109,6 +109,11 @@ export class BookingDetailsService {
           throw new BadRequestException('Start date and end date are required for custom period');
         }
         break;
+      case OverviewPeriod.ALL:
+        // No additional where clause needed for all data
+        // Fetch all data without any date restrictions
+        queryBuilder = queryBuilder.where('');
+        break;
       default:
         throw new BadRequestException('Invalid period provided');
     }
@@ -126,7 +131,10 @@ export class BookingDetailsService {
     };
   }
   async findOne(id: string): Promise<BookingDetail> {
-    const bookingDetail = await this.bookingDetailsRepository.findOne({ where: { id }, relations: ['booking', 'position'] });
+    const bookingDetail = await this.bookingDetailsRepository.findOne({
+      where: { id },
+      relations: ['booking', 'position', 'booking.customer']
+    });
     if (!bookingDetail) {
       throw new NotFoundException(`BookingDetail with ID ${id} not found`);
     }
