@@ -188,13 +188,15 @@ export class OrdersService {
         relations: ['orderItems'],
       });
 
+      console.log('order', order);
+
       if (!order) {
         throw new NotFoundException(`Order with ID "${id}" not found`);
       }
 
-      if (order.status === OrderStatus.PAID) {
-        throw new BadRequestException(`Order with ID "${id}" is already paid`);
-      }
+      // if (order.status === OrderStatus.PAID) {
+      //   throw new BadRequestException(`Order with ID "${id}" is already paid`);
+      // }
 
       // Update order status
       order.status = OrderStatus.PAID;
