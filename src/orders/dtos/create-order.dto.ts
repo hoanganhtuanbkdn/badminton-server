@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsEnum, IsArray, ValidateNested } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsEnum, IsArray, ValidateNested, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderStatus, PaymentMethod } from '../orders.entity';
 
@@ -31,9 +31,10 @@ export class CreateOrderDto {
   @IsEnum(OrderStatus)
   status: OrderStatus;
 
-  @ApiProperty({ description: 'The payment method for the order', enum: PaymentMethod })
-  @IsEnum(PaymentMethod)
-  paymentMethod: PaymentMethod;
+  @ApiProperty({ description: 'The payment method of the order item', enum: ['TRANSFER', 'CASH'], example: 'TRANSFER' })
+  @IsString()
+  @IsOptional()
+  paymentMethod: string;
 
   @ApiProperty({ description: 'The total amount of the order' })
   @IsNumber()
