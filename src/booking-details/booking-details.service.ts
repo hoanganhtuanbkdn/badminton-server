@@ -79,10 +79,10 @@ export class BookingDetailsService {
       .select([
         'COUNT(bookingDetail.id) as totalBookingDetails',
         'SUM(booking.finalAmount) as totalBookingAmount',
-        'SUM(CASE WHEN booking.paymentStatus = \'Paid\' THEN booking.finalAmount ELSE 0 END) as totalPaidAmount',
-        'SUM(CASE WHEN booking.paymentStatus != \'Paid\' THEN booking.finalAmount ELSE 0 END) as totalUnpaidAmount',
-        'SUM(CASE WHEN booking.paymentStatus = \'Paid\' THEN 1 ELSE 0 END) as paidCount',
-        'SUM(CASE WHEN booking.paymentStatus != \'Paid\' THEN 1 ELSE 0 END) as unpaidCount',
+        'SUM(CASE WHEN booking.paymentStatus = \'PAID\' THEN booking.finalAmount ELSE 0 END) as totalPaidAmount',
+        'SUM(CASE WHEN booking.paymentStatus != \'PAID\' THEN booking.finalAmount ELSE 0 END) as totalUnpaidAmount',
+        'SUM(CASE WHEN booking.paymentStatus = \'PAID\' THEN 1 ELSE 0 END) as paidCount',
+        'SUM(CASE WHEN booking.paymentStatus != \'PAID\' THEN 1 ELSE 0 END) as unpaidCount',
         'COUNT(DISTINCT customer.id) as totalCustomers'
       ]);
 

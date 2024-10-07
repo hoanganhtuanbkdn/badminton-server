@@ -4,15 +4,15 @@ import { OrderItem } from '../order-items/order-items.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum OrderStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  CANCELLED = 'cancelled'
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  CANCELLED = 'CANCELLED'
 }
 
 export enum PaymentMethod {
-  CASH = 'cash',
-  CREDIT_CARD = 'credit_card',
-  BANK_TRANSFER = 'bank_transfer'
+  CASH = 'CASH',
+  CREDIT_CARD = 'CREDIT_CARD',
+  BANK_TRANSFER = 'BANK_TRANSFER'
 }
 
 @Entity('orders')

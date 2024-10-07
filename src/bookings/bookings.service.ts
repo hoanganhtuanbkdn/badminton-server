@@ -50,8 +50,26 @@ export class BookingsService {
       const savedBooking: any = await this.bookingsRepository.save(booking);
 
       if (customer) {
-        const customerEntity = this.customersRepository.create({ ...customer, bookingId: savedBooking.id });
-        await this.customersRepository.save(customerEntity);
+        let existingCustomer;
+        if (customer.phoneNumber) {
+          existingCustomer = await this.customersRepository.findOne({
+            where: { name: customer.name, phoneNumber: customer.phoneNumber }
+          });
+        } else {
+          existingCustomer = await this.customersRepository.findOne({
+            where: { name: customer.name }
+          });
+        }
+
+        if (existingCustomer) {
+          // Update existing customer with new booking
+          existingCustomer.bookingId = savedBooking.id;
+          await this.customersRepository.save(existingCustomer);
+        } else {
+          // Create new customer
+          const customerEntity = this.customersRepository.create({ ...customer, bookingId: savedBooking.id });
+          await this.customersRepository.save(customerEntity);
+        }
       }
 
       // Calculate the total amount based on booking details

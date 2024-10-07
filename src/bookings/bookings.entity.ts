@@ -11,6 +11,24 @@ export enum BookingMode {
   JOIN_COURT = 'JOIN_COURT',  // Ghép sân
 }
 
+export enum PaymentStatus {
+  UNPAID = "UNPAID", // chưa thanh toán
+  PAID = "PAID", // đã thanh toán
+  HALF_DEPOSITED = "HALF_DEPOSITED", // cọc 50%
+}
+
+export enum PaymentType {
+  PAY_LATER = "PAY_LATER",
+  HALF_DEPOSIT = "HALF_DEPOSIT",
+  FULL_PREPAYMENT = "FULL_PREPAYMENT",
+}
+
+export enum PaymentMethod {
+  NONE = "",
+  CASH = "CASH",
+  TRANSFER = "TRANSFER",
+  CASH_TRANSFER = "CASH_TRANSFER",
+}
 
 @Entity('bookings')
 export class Booking {
@@ -57,25 +75,28 @@ export class Booking {
   discountInfo: number;
 
   @ApiProperty({
-    description: 'Payment method of the booking: Tiền mặt, chuyển khoản',
-    // example: 'Paid',
+    description: 'Payment method of the booking',
+    enum: PaymentMethod,
+    example: PaymentMethod.CASH,
   })
-  @Column({ name: 'payment_method', nullable: true, })
-  paymentMethod: string;
+  @Column({ name: 'payment_method', type: 'enum', enum: PaymentMethod, nullable: true })
+  paymentMethod: PaymentMethod;
 
   @ApiProperty({
-    description: 'Payment type of the booking: Cọc trước 50%, trả trước 100%, trả sau',
-    example: 'Paid',
+    description: 'Payment type of the booking',
+    enum: PaymentType,
+    example: PaymentType.FULL_PREPAYMENT,
   })
-  @Column({ name: 'payment_type', nullable: true, })
-  paymentType: string;
+  @Column({ name: 'payment_type', type: 'enum', enum: PaymentType, nullable: true })
+  paymentType: PaymentType;
 
   @ApiProperty({
     description: 'Payment status of the booking',
-    example: 'Paid',
+    enum: PaymentStatus,
+    example: PaymentStatus.PAID,
   })
-  @Column({ name: 'payment_status', nullable: true })
-  paymentStatus: string;
+  @Column({ name: 'payment_status', type: 'enum', enum: PaymentStatus, nullable: true })
+  paymentStatus: PaymentStatus;
 
   @ApiProperty({
     description: 'Additional notes for the booking',

@@ -68,8 +68,7 @@ export class Payment {
   paymentDate: Date;
 
   @ApiProperty({
-    description: 'Status of the payment (e.g., Paid, Pending, Failed)',
-    example: 'Paid',
+    description: 'Status of the payment (e.g., PAID, UNPAID)'
   })
   @Column()
   paymentStatus: string;

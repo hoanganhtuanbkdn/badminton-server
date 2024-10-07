@@ -27,7 +27,7 @@ export class BookingDetailsController {
   @ApiQuery({ name: 'courtId', required: false, description: 'Filter by court ID' })
   @ApiQuery({ name: 'positionId', required: false, description: 'Filter by position ID' })
   @ApiQuery({ name: 'ownerId', required: false, description: 'Filter by owner ID' })
-  @ApiQuery({ name: 'paymentStatus', required: false, description: 'Filter by payment status (e.g., Paid, Unpaid)' })
+  @ApiQuery({ name: 'paymentStatus', required: false, description: 'Filter by payment status (e.g., PAID, UNPAID)' })
   @ApiQuery({ name: 'customerName', required: false, description: 'Search by customer name' })
   @ApiQuery({ name: 'startDate', required: false, description: 'Start date for filtering by bookingDate' })
   @ApiQuery({ name: 'endDate', required: false, description: 'End date for filtering by bookingDate' })

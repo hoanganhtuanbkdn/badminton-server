@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Booking, BookingMode } from './bookings.entity';
+import { Booking, BookingMode, PaymentStatus } from './bookings.entity';
 import { CreateGuestBookingDto } from './dto/create-guest-booking.dto';
 import { Customer } from 'src/customers/customers.entity';
 import { BookingDetail, BookingType } from 'src/booking-details/booking-details.entity';
@@ -77,7 +77,7 @@ export class GuestBookingsService {
       throw new NotFoundException(`Booking with ID "${id}" not found`);
     }
 
-    if (booking.paymentStatus === 'Paid') {
+    if (booking.paymentStatus === PaymentStatus.PAID) {
       throw new BadRequestException('Cannot cancel a paid booking');
     }
 

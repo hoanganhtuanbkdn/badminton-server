@@ -31,7 +31,6 @@ export class CreateBookingDto {
 
   @ApiProperty({
     description: 'Payment method of the booking: Tiền mặt, chuyển khoản',
-    // example: 'Paid',
   })
   @IsString()
   @IsNotEmpty()
@@ -39,7 +38,6 @@ export class CreateBookingDto {
 
   @ApiProperty({
     description: 'Payment type of the booking: Cọc trước 50%, trả trước 100%, trả sau',
-    // example: 'Paid',
   })
   @IsString()
   @IsNotEmpty()

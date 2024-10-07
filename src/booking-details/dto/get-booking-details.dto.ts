@@ -50,7 +50,7 @@ export class GetBookingDetailsDto {
   @IsString()
   ownerId?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by payment status (e.g., Paid, Unpaid)' })
+  @ApiPropertyOptional({ description: 'Filter by payment status (e.g., PAID, UNPAID)' })
   @IsOptional()
   @IsString()
   paymentStatus?: string;
