@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Customer } from './customers.entity';
 import { GetCustomersDto, CreateCustomerDto, UpdateCustomerDto } from './dto';
+import { NotFoundException } from '@nestjs/common';
+import { Booking } from 'src/bookings/bookings.entity';
 
 @Injectable()
 export class CustomersService {
@@ -46,5 +48,18 @@ export class CustomersService {
 
   async remove(id: string): Promise<void> {
     await this.customersRepository.delete(id);
+  }
+
+  async findCustomerBookings(customerId: string): Promise<Booking[]> {
+    const customer = await this.customersRepository.findOne({
+      where: { id: customerId },
+      relations: ['bookings'],
+    });
+
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID "${customerId}" not found`);
+    }
+
+    return customer.bookings;
   }
 }

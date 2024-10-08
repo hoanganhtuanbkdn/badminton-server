@@ -28,23 +28,35 @@ export class GuestBookingsService {
       throw new NotFoundException(`Court with ID "${courtId}" not found`);
     }
 
+    // Create or find the customer
+    let customer = await this.customersRepository.findOne({
+      where: {
+        name: guestName,
+        phoneNumber: guestPhone
+      }
+    });
+
+    if (!customer) {
+      customer = this.customersRepository.create({
+        name: guestName,
+        phoneNumber: guestPhone,
+        email: guestEmail,
+      });
+      customer = await this.customersRepository.save(customer);
+    }
+
+    // Create the booking
     const booking = this.bookingsRepository.create({
       ...bookingData,
       courtId,
       totalAmount,
+      customerId: customer.id,
       bookingMode: BookingMode.BOOK_COURT,
     });
 
     const savedBooking = await this.bookingsRepository.save(booking);
 
-    const customer = this.customersRepository.create({
-      name: guestName,
-      phoneNumber: guestPhone,
-      email: guestEmail,
-      bookingId: savedBooking.id,
-    });
-    await this.customersRepository.save(customer);
-
+    // Create booking details
     if (bookingDetails && bookingDetails.length > 0) {
       const bookingDetailsEntities = bookingDetails.map(detail => {
         const bookingAmount = detail.bookingType === BookingType.WALK_IN
@@ -70,7 +82,7 @@ export class GuestBookingsService {
   async cancelGuestBooking(id: string): Promise<void> {
     const booking = await this.bookingsRepository.findOne({
       where: { id },
-      relations: ['customer', 'bookingDetails'],
+      relations: ['bookingDetails'],
     });
 
     if (!booking) {
@@ -84,11 +96,6 @@ export class GuestBookingsService {
     // Delete associated booking details
     if (booking.bookingDetails) {
       await this.bookingDetailsRepository.remove(booking.bookingDetails);
-    }
-
-    // Delete associated customer
-    if (booking.customer) {
-      await this.customersRepository.remove(booking.customer);
     }
 
     // Delete the booking
