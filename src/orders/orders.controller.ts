@@ -5,6 +5,7 @@ import { CreateOrderDto, UpdateOrderDto, GetOrderDto } from './dtos';
 import { Order } from './orders.entity';
 import { CreateOrderItemDto } from '../order-items/dtos/create-order-item.dto';
 import { OrderItem } from '../order-items/order-items.entity';
+import { PaymentMethod } from './orders.entity';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -63,10 +64,26 @@ export class OrdersController {
   @Post(':id/confirm-payment')
   @ApiOperation({ summary: 'Confirm payment for an order' })
   @ApiParam({ name: 'id', description: 'ID of the order to confirm payment' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        paymentMethod: {
+          type: 'string',
+          enum: ['CASH', 'TRANSFER'],
+          description: 'The payment method used'
+        }
+      }
+    }
+  })
   @ApiResponse({ status: 200, description: 'The order payment has been successfully confirmed.', type: Order })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 404, description: 'Order not found.' })
-  confirmPayment(@Param('id') id: string): Promise<Order> {
-    return this.ordersService.confirmPayment(id);
+  confirmPayment(
+    @Param('id') id: string,
+    @Body('paymentMethod') paymentMethod: PaymentMethod
+  ): Promise<Order> {
+    return this.ordersService.confirmPayment(id, paymentMethod);
   }
 
   @Get('by-booking-detail/:bookingDetailId')
