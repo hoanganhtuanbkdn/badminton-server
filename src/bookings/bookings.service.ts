@@ -63,12 +63,14 @@ export class BookingsService {
 
         if (existingCustomer) {
           // Update existing customer with new booking
-          existingCustomer.bookingId = savedBooking.id;
-          await this.customersRepository.save(existingCustomer);
+          savedBooking.customerId = existingCustomer.id;
+          await this.bookingsRepository.save(savedBooking);
         } else {
           // Create new customer
-          const customerEntity = this.customersRepository.create({ ...customer, bookingId: savedBooking.id });
-          await this.customersRepository.save(customerEntity);
+          const customerEntity = this.customersRepository.create(customer);
+          const savedCustomer = await this.customersRepository.save(customerEntity) as unknown as Customer;
+          savedBooking.customerId = savedCustomer.id;
+          await this.bookingsRepository.save(savedBooking);
         }
       }
 
@@ -282,9 +284,101 @@ export class BookingsService {
   // Update a booking by ID
   async update(id: string, updateBookingDto: UpdateBookingDto): Promise<Booking> {
     const booking = await this.findOne(id);
+    const { customer, bookingDetails, voucherCode, ...bookingData } = updateBookingDto;
 
-    Object.assign(booking, updateBookingDto);
-    return this.bookingsRepository.save(booking);
+    // Update customer if provided
+    if (customer) {
+      let existingCustomer = await this.customersRepository.findOne({
+        where: { name: customer.name, phoneNumber: customer.phoneNumber }
+      });
+
+      if (!existingCustomer) {
+        existingCustomer = this.customersRepository.create(customer);
+        existingCustomer = await this.customersRepository.save(existingCustomer);
+      }
+
+      booking.customerId = existingCustomer.id;
+    }
+
+    // Update booking details if provided
+    if (bookingDetails?.length > 0) {
+      // Remove existing booking details
+      await this.bookingDetailsRepository.delete({ bookingId: booking.id });
+
+      const court = await this.courtsRepository.findOne({
+        where: { id: booking.courtId }
+      });
+
+      let totalAmount = 0;
+
+      const newBookingDetails = await Promise.all(
+        bookingDetails.map(async (detail) => {
+          let bookingAmount = 0;
+
+          if (detail.bookingType === BookingType.WALK_IN) {
+            bookingAmount = Number(court.walkInFee || 0) * Number(detail.duration || 0);
+          } else if (detail.bookingType === BookingType.SCHEDULED) {
+            bookingAmount = Number(court.fixedFee || 0) * Number(detail.duration || 0);
+          }
+
+          totalAmount += bookingAmount;
+
+          return this.bookingDetailsRepository.create({
+            ...detail,
+            bookingAmount,
+            courtId: booking.courtId,
+            bookingId: booking.id,
+          });
+        })
+      );
+
+      await this.bookingDetailsRepository.save(newBookingDetails);
+      booking.totalAmount = totalAmount;
+    }
+
+    // Apply new voucher code if provided
+    if (voucherCode) {
+      const voucher = await this.vouchersRepository.findOne({ where: { code: voucherCode } });
+
+      if (voucher) {
+        const currentDate = new Date();
+        const isValidFrom = voucher.validFrom ? new Date(voucher.validFrom) <= currentDate : true;
+        const isValidUntil = voucher.validUntil ? new Date(voucher.validUntil) >= currentDate : true;
+        const isAvailableUsage = voucher.availableUsage !== undefined ? voucher.availableUsage > 0 : true;
+
+        if (isValidFrom && isValidUntil && isAvailableUsage) {
+          let discountInfo = 0;
+
+          if (voucher.discountPercentage > 0) {
+            discountInfo = (booking.totalAmount * voucher.discountPercentage) / 100;
+          } else if (voucher.discountValue > 0) {
+            discountInfo = voucher.discountValue;
+          }
+
+          discountInfo = Math.min(discountInfo, booking.totalAmount);
+          booking.finalAmount = booking.totalAmount - discountInfo;
+          booking.discountInfo = discountInfo;
+          booking.voucherCode = voucherCode;
+
+          if (voucher.availableUsage !== undefined) {
+            voucher.availableUsage -= 1;
+            await this.vouchersRepository.save(voucher);
+          }
+        }
+      }
+    }
+
+    // Update other booking data
+    Object.assign(booking, bookingData);
+
+    // Save the updated booking
+    const updatedBooking = await this.bookingsRepository.save(booking);
+
+    // Return the fully populated updated booking entity
+    return this.bookingsRepository.findOne({
+      where: { id: updatedBooking.id },
+      relations: ['customer', 'bookingDetails', 'bookingDetails.position', 'payments'],
+    });
   }
 
   // Delete a booking by ID

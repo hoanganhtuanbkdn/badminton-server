@@ -3,6 +3,8 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from 
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateOrderDto, GetOrderDto } from './dtos';
 import { Order } from './orders.entity';
+import { CreateOrderItemDto } from '../order-items/dtos/create-order-item.dto';
+import { OrderItem } from '../order-items/order-items.entity';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -24,6 +26,7 @@ export class OrdersController {
   @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
   @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
+  @ApiQuery({ name: 'bookingDetailId', required: false, description: 'Filter by booking detail ID' })
   @ApiResponse({ status: 200, description: 'Return all orders with pagination, sorting, and filtering.', type: [Order] })
   findAll(@Query() getOrdersDto: GetOrderDto): Promise<{ data: Order[]; total: number; page?: number; limit?: number }> {
     return this.ordersService.findAll(getOrdersDto);
@@ -55,5 +58,34 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Order not found.' })
   remove(@Param('id') id: string): Promise<void> {
     return this.ordersService.remove(id);
+  }
+
+  @Post(':id/confirm-payment')
+  @ApiOperation({ summary: 'Confirm payment for an order' })
+  @ApiParam({ name: 'id', description: 'ID of the order to confirm payment' })
+  @ApiResponse({ status: 200, description: 'The order payment has been successfully confirmed.', type: Order })
+  @ApiResponse({ status: 404, description: 'Order not found.' })
+  confirmPayment(@Param('id') id: string): Promise<Order> {
+    return this.ordersService.confirmPayment(id);
+  }
+
+  @Get('by-booking-detail/:bookingDetailId')
+  @ApiOperation({ summary: 'Get orders by booking detail ID' })
+  @ApiParam({ name: 'bookingDetailId', description: 'ID of the booking detail' })
+  @ApiResponse({ status: 200, description: 'Return the orders for the given booking detail ID.', type: [Order] })
+  @ApiResponse({ status: 404, description: 'No orders found for the given booking detail ID.' })
+  findByBookingDetailId(@Param('bookingDetailId') bookingDetailId: string): Promise<Order[]> {
+    return this.ordersService.findByBookingDetailId(bookingDetailId);
+  }
+
+  @Post(':orderId/add-products')
+  @ApiOperation({ summary: 'Add order items to an existing order' })
+  @ApiParam({ name: 'orderId', description: 'ID of the order to add items to' })
+  @ApiBody({ type: [CreateOrderItemDto] })
+  @ApiResponse({ status: 201, description: 'The order items have been successfully added.', type: [OrderItem] })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 404, description: 'Order not found.' })
+  addOrderItems(@Param('orderId') orderId: string, @Body() createOrderItemDtos: CreateOrderItemDto[]): Promise<OrderItem[]> {
+    return this.ordersService.addOrderItems(orderId, createOrderItemDtos);
   }
 }

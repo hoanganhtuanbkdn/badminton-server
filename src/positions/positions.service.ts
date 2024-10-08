@@ -84,12 +84,16 @@ export class PositionsService {
     }
   }
 
-  async findAvailablePositions(courtId: string, startTime: string, duration: number, bookingDate: Date): Promise<Position[]> {
+  async findAvailablePositions(courtId: string, startTime?: string, duration?: number, bookingDate?: Date): Promise<Position[]> {
     try {
+      if (!startTime || !duration || !bookingDate) {
+        // If any of startTime, duration, or bookingDate is not provided, return all positions for the court
+        return this.positionsRepository.find({ where: { courtId } });
+      }
+
       const endTime = new Date(`${bookingDate.toISOString().split('T')[0]}T${startTime}`);
       endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
-      console.log(startTime, duration, bookingDate);
       const positions = await this.positionsRepository.createQueryBuilder('position')
         .leftJoinAndSelect('position.bookingDetails', 'bookingDetail')
         .where('position.courtId = :courtId', { courtId })
@@ -105,7 +109,6 @@ export class PositionsService {
         })
         .getMany();
 
-      console.log(positions);
       return positions;
     } catch (error) {
       console.error('Error in findAvailablePositions:', error);

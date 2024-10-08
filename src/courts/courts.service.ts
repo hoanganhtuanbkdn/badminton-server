@@ -49,21 +49,19 @@ export class CourtsService {
 
   async searchByLocation(searchDto: any) {
     const now = new Date();
-    console.log(1, searchDto);
 
     const {
       latitude,
       longitude,
       radius,
-      bookingDate = now,
-      startTime = now.toTimeString().slice(0, 5),
-      duration = 120,
+      bookingDate,
+      startTime,
+      duration,
       numberOfCourts,
       page = 1,
       limit = 10
     } = searchDto;
 
-    console.log(searchDto);
     try {
       let query = this.courtsRepository.createQueryBuilder('court');
 
@@ -88,6 +86,7 @@ export class CourtsService {
         let courtWithDetails = {
           ...court,
           availablePositionsCount: availablePositions.length,
+          availablePositions
         };
 
         if (latitude && longitude && court.latitude && court.longitude) {
@@ -131,29 +130,36 @@ export class CourtsService {
     return this.courtsRepository.find({ where: { ownerId } });
   }
 
-  async findOne(id: string, latitude?: number, longitude?: number) {
+  async findOne(id: string, latitude?: number, longitude?: number, bookingDate?: Date, startTime?: string, duration?: number) {
     const court = await this.courtsRepository.findOne({ where: { id } });
 
     if (!court) {
       throw new NotFoundException(`Court with ID ${id} not found`);
     }
 
-    if (latitude && longitude && court.latitude && court.longitude) {
-      const R = 6371; // Earth's radius in km
-      const dLat = (court.latitude - latitude) * (Math.PI / 180);
-      const dLon = (court.longitude - longitude) * (Math.PI / 180);
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(latitude * (Math.PI / 180)) * Math.cos(court.latitude * (Math.PI / 180)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = Number((R * c * 1000).toFixed(2)); // Convert to meters and round to 2 decimal places
-      const distanceWithUnit = `${distance} m`;
+    let result: any = { ...court };
 
-      return { ...court, distance, distanceWithUnit };
+    const availablePositions = await this.positionsService.findAvailablePositions(court.id, startTime, duration, bookingDate);
+    result.availablePositionsCount = availablePositions.length;
+    result.availablePositions = availablePositions;
+
+    if (latitude && longitude && court.latitude && court.longitude) {
+      const earthRadius = 6371; // Earth's radius in km
+      const latDiff = (court.latitude - latitude) * (Math.PI / 180);
+      const lonDiff = (court.longitude - longitude) * (Math.PI / 180);
+      const haversine =
+        Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+        Math.cos(latitude * (Math.PI / 180)) * Math.cos(court.latitude * (Math.PI / 180)) *
+        Math.sin(lonDiff / 2) * Math.sin(lonDiff / 2);
+      const centralAngle = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+      const distanceInMeters = Number((earthRadius * centralAngle * 1000).toFixed(2)); // Convert to meters and round to 2 decimal places
+      const formattedDistance = `${distanceInMeters} m`;
+
+      result.distanceInMeters = distanceInMeters;
+      result.formattedDistance = formattedDistance;
     }
 
-    return { ...court };
+    return result;
   }
 
   async update(id: string, updateCourtDto: any): Promise<Court> {

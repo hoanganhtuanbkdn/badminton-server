@@ -20,7 +20,9 @@ export class CreateProductDto {
   @IsOptional()
   stockQuantity: number;
 
-  @ApiProperty({ description: 'ID of the product category' })
+  @ApiPropertyOptional({ description: 'ID of the product category' })
+  @IsString()
+  @IsOptional()
   categoryId: string;
 
   @ApiProperty({ description: 'ID of the court' })

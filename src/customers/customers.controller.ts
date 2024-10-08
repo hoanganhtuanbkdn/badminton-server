@@ -3,6 +3,7 @@ import { CustomersService } from './customers.service';
 import { CreateCustomerDto, UpdateCustomerDto, GetCustomersDto } from './dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody, getSchemaPath } from '@nestjs/swagger';
 import { Customer } from './customers.entity';
+import { Booking } from 'src/bookings/bookings.entity';
 
 @ApiTags('customers')
 @Controller('customers')
@@ -66,5 +67,14 @@ export class CustomersController {
   @ApiResponse({ status: 404, description: 'Customer not found.' })
   remove(@Param('id') id: string) {
     return this.customersService.remove(id);
+  }
+
+  @Get(':id/bookings')
+  @ApiOperation({ summary: 'Get all bookings for a customer' })
+  @ApiParam({ name: 'id', description: 'ID of the customer' })
+  @ApiResponse({ status: 200, description: 'Return all bookings for the customer.', type: [Booking] })
+  @ApiResponse({ status: 404, description: 'Customer not found.' })
+  findCustomerBookings(@Param('id') id: string) {
+    return this.customersService.findCustomerBookings(id);
   }
 }

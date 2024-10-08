@@ -23,6 +23,7 @@ import { VouchersModule } from './vouchers/vouchers.module';
 import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { ProductCategoriesModule } from './product-categories/product-categories.module';
+import { OrderItemsModule } from './order-items/order-items.module';
 
 @Module({
   imports: [
@@ -50,7 +51,8 @@ import { ProductCategoriesModule } from './product-categories/product-categories
     VouchersModule,
     OrdersModule,
     ProductsModule,
-    ProductCategoriesModule
+    ProductCategoriesModule,
+    OrderItemsModule
   ],
   controllers: [AppController],
   providers: [

@@ -142,8 +142,16 @@ export class Booking {
     description: 'Customer associated with the booking',
     type: () => Customer,
   })
-  @OneToOne(() => Customer, customer => customer.booking)
+  @ManyToOne(() => Customer, customer => customer.bookings)
+  @JoinColumn({ name: 'customer_id' })
   customer: Customer;
+
+  @ApiProperty({
+    description: 'ID of the customer associated with the booking',
+    example: 'uuid',
+  })
+  @Column({ type: 'uuid', name: 'customer_id', nullable: true })
+  customerId: string;
 
   @ApiProperty({
     description: 'Unique identifier for the court',
@@ -174,6 +182,4 @@ export class Booking {
   @OneToMany(() => Payment, payment => payment.booking)
   payments: Payment[];
 
-  @OneToMany(() => Order, order => order.booking)
-  orders: Order[];
 }

@@ -1,18 +1,16 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
-import { Booking } from '../bookings/bookings.entity';
+import { BookingDetail } from '../booking-details/booking-details.entity';
 import { OrderItem } from '../order-items/order-items.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum OrderStatus {
-  PENDING = 'PENDING',
   PAID = 'PAID',
-  CANCELLED = 'CANCELLED'
+  UNPAID = 'UNPAID'
 }
 
 export enum PaymentMethod {
   CASH = 'CASH',
-  CREDIT_CARD = 'CREDIT_CARD',
-  BANK_TRANSFER = 'BANK_TRANSFER'
+  TRANSFER = 'TRANSFER'
 }
 
 @Entity('orders')
@@ -21,33 +19,39 @@ export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ description: 'The ID of the booking associated with this order' })
-  @Column({ name: 'booking_id' })
-  bookingId: string;
+  @ApiProperty({ description: 'The order code' })
+  @Column({ unique: true })
+  orderCode: string;
 
-  @ApiProperty({ description: 'The booking associated with this order', type: () => Booking })
-  @ManyToOne(() => Booking, booking => booking.orders)
-  @JoinColumn({ name: 'booking_id' })
-  booking: Booking;
+  @ApiProperty({ description: 'The ID of the booking detail associated with this order' })
+  @Column({ name: 'booking_detail_id' })
+  bookingDetailId: string;
+
+  @ApiProperty({ description: 'The booking detail associated with this order', type: () => BookingDetail })
+  @ManyToOne(() => BookingDetail, bookingDetail => bookingDetail.orders)
+  @JoinColumn({ name: 'booking_detail_id' })
+  bookingDetail: BookingDetail;
 
   @ApiProperty({ description: 'The items in this order', type: () => [OrderItem] })
   @OneToMany(() => OrderItem, orderItem => orderItem.order)
   orderItems: OrderItem[];
 
-  @ApiProperty({ description: 'The status of the order', enum: OrderStatus })
+  @ApiProperty({ description: 'Payment status of the order', enum: ['PAID', 'UNPAID'], example: 'UNPAID' })
   @Column({
     type: 'enum',
-    enum: OrderStatus,
-    default: OrderStatus.PENDING
+    enum: ['PAID', 'UNPAID'],
+    default: 'UNPAID',
+    nullable: true
   })
-  status: OrderStatus;
+  status: string;
 
-  @ApiProperty({ description: 'The payment method for the order', enum: PaymentMethod })
+  @ApiProperty({ description: 'Payment method for the order', enum: ['TRANSFER', 'CASH'], nullable: true, example: 'TRANSFER' })
   @Column({
     type: 'enum',
-    enum: PaymentMethod
+    enum: ['TRANSFER', 'CASH'],
+    nullable: true
   })
-  paymentMethod: PaymentMethod;
+  paymentMethod: string;
 
   @ApiProperty({ description: 'The total amount of the order' })
   @Column('decimal', { precision: 10, scale: 2 })

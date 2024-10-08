@@ -12,9 +12,9 @@ export class ProductsService {
     private productsRepository: Repository<Product>,
   ) { }
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
+  async create(createProductDto: any): Promise<Product> {
     const product = this.productsRepository.create(createProductDto);
-    return await this.productsRepository.save(product);
+    return await this.productsRepository.save(product) as any;
   }
 
   async findAll(query: {
