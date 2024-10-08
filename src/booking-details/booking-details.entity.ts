@@ -112,7 +112,7 @@ export class BookingDetail {
   bookingDay?: string;
 
   @ApiProperty({
-    description: 'bookingMonth: 5',
+    description: 'The month of the booking detail with booking type is SCHEDULED',
     example: "5",
   })
   @Column({
@@ -128,6 +128,13 @@ export class BookingDetail {
   })
   @Column({ name: "booking_date", nullable: true, })
   bookingDate: string;
+
+  @ApiProperty({
+    description: 'The start date for the booking detail with booking type is SCHEDULED',
+    example: '2024-08-28',
+  })
+  @Column({ name: "start_date", nullable: true, })
+  startDate: string;
 
   @ApiProperty({
     description: 'The end time for the booking detail',

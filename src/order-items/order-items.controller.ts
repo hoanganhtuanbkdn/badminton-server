@@ -51,4 +51,13 @@ export class OrderItemsController {
   remove(@Param('id') id: string): Promise<void> {
     return this.orderItemsService.remove(id);
   }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get an order item by ID' })
+  @ApiParam({ name: 'id', description: 'ID of the order item to retrieve' })
+  @ApiResponse({ status: 200, description: 'Return the order item.', type: OrderItem })
+  @ApiResponse({ status: 404, description: 'Order item not found.' })
+  findOne(@Param('id') id: string): Promise<OrderItem> {
+    return this.orderItemsService.findOne(id);
+  }
 }

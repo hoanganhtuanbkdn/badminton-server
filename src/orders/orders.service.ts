@@ -6,6 +6,7 @@ import { OrderItem } from '../order-items/order-items.entity';
 import { Product } from '../products/products.entity';
 import { BookingDetail } from '../booking-details/booking-details.entity';
 import { CreateOrderDto, UpdateOrderDto, GetOrderDto } from './dtos';
+import { CreateOrderItemDto } from '../order-items/dtos/create-order-item.dto';
 
 @Injectable()
 export class OrdersService {
@@ -188,13 +189,15 @@ export class OrdersService {
         relations: ['orderItems'],
       });
 
+      console.log('order', order);
+
       if (!order) {
         throw new NotFoundException(`Order with ID "${id}" not found`);
       }
 
-      if (order.status === OrderStatus.PAID) {
-        throw new BadRequestException(`Order with ID "${id}" is already paid`);
-      }
+      // if (order.status === OrderStatus.PAID) {
+      //   throw new BadRequestException(`Order with ID "${id}" is already paid`);
+      // }
 
       // Update order status
       order.status = OrderStatus.PAID;
@@ -212,6 +215,60 @@ export class OrdersService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async findByBookingDetailId(bookingDetailId: string): Promise<Order[]> {
+    const orders = await this.ordersRepository.find({
+      where: { bookingDetailId },
+      relations: ['orderItems', 'orderItems.product', 'bookingDetail'],
+    });
+
+    if (!orders || orders.length === 0) {
+      throw new NotFoundException(`No orders found for booking detail ID "${bookingDetailId}"`);
+    }
+
+    return orders;
+  }
+
+  async addOrderItems(orderId: string, createOrderItemDtos: CreateOrderItemDto[]): Promise<OrderItem[]> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const order = await this.ordersRepository.findOne({ where: { id: orderId } });
+      if (!order) {
+        throw new NotFoundException(`Order with ID "${orderId}" not found`);
+      }
+
+      const newOrderItems = await Promise.all(createOrderItemDtos.map(async (dto) => {
+        const product = await this.productRepository.findOne({ where: { id: dto.productId } });
+        if (!product) {
+          throw new NotFoundException(`Product with ID "${dto.productId}" not found`);
+        }
+
+        const orderItem = this.orderItemsRepository.create({
+          ...dto,
+          orderId,
+          price: product.price * dto.quantity,
+        });
+
+        return queryRunner.manager.save(orderItem);
+      }));
+
+      // Update the total amount of the order
+      const totalAmount = newOrderItems.reduce((sum, item) => sum + item.price, 0);
+      order.totalAmount += totalAmount;
+      await queryRunner.manager.save(order);
+
+      await queryRunner.commitTransaction();
+      return newOrderItems;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
     } finally {
       await queryRunner.release();
     }
