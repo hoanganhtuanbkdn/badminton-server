@@ -159,16 +159,21 @@ export class BookingDetailsService {
     try {
       const bookingDetail = await this.bookingDetailsRepository.findOne({
         where: { id },
-        relations: ['orders'],
+        relations: ['orders', 'orders.orderItems'],
       });
 
       if (!bookingDetail) {
         throw new NotFoundException(`BookingDetail with ID ${id} not found`);
       }
 
-      // Delete related orders
+      // Delete related order items and orders
       if (bookingDetail.orders && bookingDetail.orders.length > 0) {
-        await queryRunner.manager.remove(bookingDetail.orders);
+        for (const order of bookingDetail.orders) {
+          if (order.orderItems && order.orderItems.length > 0) {
+            await queryRunner.manager.remove(order.orderItems);
+          }
+          await queryRunner.manager.remove(order);
+        }
       }
 
       // Delete the booking detail
