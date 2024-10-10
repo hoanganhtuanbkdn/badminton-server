@@ -50,6 +50,8 @@ export class OrdersService {
             productId: item.productId,
             quantity: item.quantity,
             price: item.quantity * product.price,
+            status: createOrderDto.status,
+            paymentMethod: createOrderDto.paymentMethod,
           });
         }),
       );
