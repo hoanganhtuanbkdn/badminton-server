@@ -7,6 +7,7 @@ import { Booking } from 'src/bookings/bookings.entity';
 import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { slugify } from 'src/shared/utils';
 import { Product } from 'src/products/products.entity';
+import { ProductCategory } from 'src/product-categories/product-categories.entity';
 
 @Entity('courts')
 export class Court {
@@ -189,6 +190,13 @@ export class Court {
 
   @OneToMany(() => Product, product => product.court)
   products: Product[];
+
+  @ApiProperty({
+    description: 'List of product categories associated with this court',
+    type: () => [ProductCategory],
+  })
+  @OneToMany(() => ProductCategory, productCategory => productCategory.court)
+  productCategories: ProductCategory[];
 
   @BeforeInsert()
   generateSlug() {

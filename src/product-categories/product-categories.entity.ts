@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Product } from '../products/products.entity';
+import { Court } from '../courts/courts.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('product_categories')
@@ -15,6 +16,15 @@ export class ProductCategory {
   @ApiProperty({ description: 'The description of the product category', required: false })
   @Column({ nullable: true })
   description: string;
+
+  @ApiProperty({ description: 'The court ID this category belongs to' })
+  @Column({ name: 'court_id' })
+  courtId: string;
+
+  @ApiProperty({ description: 'The court this category belongs to', type: () => Court })
+  @ManyToOne(() => Court, court => court.productCategories)
+  @JoinColumn({ name: 'court_id' })
+  court: Court;
 
   @ApiProperty({ description: 'The products associated with this category', type: () => [Product] })
   @OneToMany(() => Product, product => product.category)
