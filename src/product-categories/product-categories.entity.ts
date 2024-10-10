@@ -18,7 +18,7 @@ export class ProductCategory {
   description: string;
 
   @ApiProperty({ description: 'The court ID this category belongs to' })
-  @Column({ name: 'court_id' })
+  @Column({ name: 'court_id', nullable: true })
   courtId: string;
 
   @ApiProperty({ description: 'The court this category belongs to', type: () => Court })
