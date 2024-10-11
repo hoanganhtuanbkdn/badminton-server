@@ -21,9 +21,9 @@ export class BookingDetailsService {
     return this.bookingDetailsRepository.save(bookingDetail);
   }
 
-  async findAll(getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
+  async findAll(getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit?: number }> {
     try {
-      const { page = 1, limit = 10, sortBy = SortByFields.CREATED_AT, sortOrder = SortOrder.DESC, courtId, positionId, ownerId, paymentStatus, customerName, startDate, endDate } = getBookingDetailsDto;
+      const { page = 1, limit, sortBy = SortByFields.CREATED_AT, sortOrder = SortOrder.DESC, courtId, positionId, ownerId, paymentStatus, customerName, startDate, endDate } = getBookingDetailsDto;
 
       const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
         .leftJoinAndSelect('bookingDetail.booking', 'booking')
@@ -32,9 +32,11 @@ export class BookingDetailsService {
         .leftJoinAndSelect('bookingDetail.owner', 'owner')
         .leftJoinAndSelect('booking.customer', 'customer')
         .leftJoinAndSelect('booking.payments', 'payments')
-        .orderBy(`bookingDetail.${sortBy}`, sortOrder)
-        .skip((page - 1) * limit)
-        .take(limit);
+        .orderBy(`bookingDetail.${sortBy}`, sortOrder);
+
+      if (limit) {
+        queryBuilder.skip((page - 1) * limit).take(limit);
+      }
 
       if (courtId) {
         queryBuilder.andWhere('bookingDetail.courtId = :courtId', { courtId });
@@ -67,7 +69,7 @@ export class BookingDetailsService {
 
       const [data, total] = await queryBuilder.getManyAndCount();
 
-      return { data, total, page, limit };
+      return { data, total, page, ...(limit && { limit }) };
 
     } catch (e) {
       throw new BadRequestException(e.message);
