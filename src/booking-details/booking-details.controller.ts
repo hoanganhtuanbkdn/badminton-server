@@ -32,7 +32,7 @@ export class BookingDetailsController {
   @ApiQuery({ name: 'startDate', required: false, description: 'Start date for filtering by bookingDate' })
   @ApiQuery({ name: 'endDate', required: false, description: 'End date for filtering by bookingDate' })
   @ApiResponse({ status: 200, description: 'Return all booking details with pagination, sorting, and filtering.', type: [BookingDetail] })
-  findAll(@Query() getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit: number }> {
+  findAll(@Query() getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit?: number }> {
     return this.bookingDetailsService.findAll(getBookingDetailsDto);
   }
 
