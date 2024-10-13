@@ -28,13 +28,9 @@ export class ProductCategoriesController {
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'] })
   @ApiQuery({ name: 'search', required: false, type: String })
   findAll(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-    @Query('sortBy') sortBy?: string,
-    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
-    @Query('search') search?: string
+    query: any
   ): Promise<PaginatedProductCategoryListDto> {
-    return this.productCategoriesService.findAll({ page, limit, sortBy, sortOrder, search });
+    return this.productCategoriesService.findAll(query);
   }
 
   @Get(':id')

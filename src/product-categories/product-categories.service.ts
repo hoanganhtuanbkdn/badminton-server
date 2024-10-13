@@ -25,7 +25,13 @@ export class ProductCategoriesService {
     sortOrder?: 'ASC' | 'DESC';
     search?: string;
   }): Promise<{ items: ProductCategoryListDto[]; total: number }> {
-    const { page, limit, sortBy = 'createdAt', sortOrder = 'DESC', search } = options;
+    const {
+      page,
+      limit,
+      sortBy = 'createdAt',
+      sortOrder = 'DESC',
+      search
+    } = options || {};
 
     const query = this.productCategoriesRepository
       .createQueryBuilder('category')
@@ -37,7 +43,9 @@ export class ProductCategoriesService {
     }
 
     if (page !== undefined && limit !== undefined) {
-      query.skip((page - 1) * limit).take(limit);
+      const skip = (Number(page) - 1) * Number(limit);
+      const take = Number(limit);
+      query.skip(skip).take(take);
     }
 
     const [categories, total] = await query
