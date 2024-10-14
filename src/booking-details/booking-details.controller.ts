@@ -36,19 +36,6 @@ export class BookingDetailsController {
     return this.bookingDetailsService.findAll(getBookingDetailsDto);
   }
 
-  @Get('/overview')
-  @ApiOperation({ summary: 'Get dashboard overview for bookings' })
-  @ApiResponse({
-    status: 200,
-    description: 'Dashboard overview retrieved successfully.',
-  })
-  @ApiQuery({ name: 'period', enum: OverviewPeriod, description: 'Display period: today, this week, this month, this quarter, or custom' })
-  @ApiQuery({ name: 'startDate', required: false, description: 'Start date (used when period is CUSTOM)' })
-  @ApiQuery({ name: 'endDate', required: false, description: 'End date (used when period is CUSTOM)' })
-  getBookingsOverview(@Query() getDashboardOverviewDto: GetDashboardOverviewDto) {
-    return this.bookingDetailsService.getOverview(getDashboardOverviewDto);
-  }
-
   @Get(':id')
   @ApiOperation({ summary: 'Get a booking detail by ID' })
   @ApiParam({ name: 'id', description: 'ID of the booking detail to retrieve' })

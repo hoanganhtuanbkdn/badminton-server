@@ -25,7 +25,7 @@ export class ProductsService {
     search?: string;
     categoryId?: string;
   }): Promise<{ data: Product[]; total: number; page?: number; limit?: number }> {
-    const { page, limit, sortBy = 'createdAt', sortOrder = 'DESC', search, categoryId } = query;
+    const { page, limit, sortBy = 'priority', sortOrder = 'DESC', search, categoryId } = query;
 
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category');
@@ -38,7 +38,9 @@ export class ProductsService {
       queryBuilder.andWhere('product.category.id = :categoryId', { categoryId });
     }
 
-    queryBuilder.orderBy(`product.${sortBy}`, sortOrder);
+    // Sắp xếp theo priority trước, sau đó là trường sortBy
+    queryBuilder.orderBy('product.priority', 'DESC')
+      .addOrderBy(`product.${sortBy}`, sortOrder);
 
     if (page && limit) {
       queryBuilder.skip((page - 1) * limit).take(limit);

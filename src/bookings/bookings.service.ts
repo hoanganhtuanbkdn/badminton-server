@@ -9,6 +9,7 @@ import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Voucher } from 'src/vouchers/vouchers.entity';
 import { Court } from 'src/courts/courts.entity';
+import { GetDashboardOverviewDto, OverviewPeriod } from '../booking-details/dto/get-dashboard-overview.dto';
 
 @Injectable()
 export class BookingsService {
@@ -168,11 +169,6 @@ export class BookingsService {
     try {
       // Fetch all bookings with null values in the fields that need recalculation
       const bookingsToUpdate = await this.bookingsRepository.find({
-        where: [
-          { totalAmount: IsNull() },
-          { finalAmount: IsNull() },
-          { discountInfo: IsNull() },
-        ],
         relations: ['bookingDetails', 'customer'],
       });
 
@@ -194,6 +190,8 @@ export class BookingsService {
 
           totalAmount += bookingAmount;
         }
+
+        console.log('totalAmount', totalAmount);
 
         // Apply voucher if available
         if (booking.voucherCode) {
@@ -386,4 +384,66 @@ export class BookingsService {
     const booking = await this.findOne(id);
     await this.bookingsRepository.delete(booking.id);
   }
+
+  async getOverview(getDashboardOverviewDto: any) {
+    const { period, startDate, endDate } = getDashboardOverviewDto;
+
+    let queryBuilder = this.bookingsRepository.createQueryBuilder('booking')
+      .leftJoin('booking.customer', 'customer')
+      .select([
+        'COUNT(booking.id) as totalBooking',
+        'SUM(booking.finalAmount) as totalBookingAmount',
+        'SUM(CASE WHEN booking.paymentStatus = \'PAID\' THEN booking.finalAmount ELSE 0 END) as totalPaidAmount',
+        'SUM(CASE WHEN booking.paymentStatus != \'PAID\' THEN booking.finalAmount ELSE 0 END) as totalUnpaidAmount',
+        'SUM(CASE WHEN booking.paymentStatus = \'PAID\' THEN 1 ELSE 0 END) as paidCount',
+        'SUM(CASE WHEN booking.paymentStatus != \'PAID\' THEN 1 ELSE 0 END) as unpaidCount',
+        'COUNT(DISTINCT customer.id) as totalCustomers'
+      ]);
+
+    // Calculate date range based on period
+    switch (period) {
+      case OverviewPeriod.TODAY:
+        queryBuilder = queryBuilder.where('DATE(booking.createdAt) = CURRENT_DATE');
+        break;
+      case OverviewPeriod.THIS_WEEK:
+        queryBuilder = queryBuilder.where('EXTRACT(WEEK FROM booking.createdAt) = EXTRACT(WEEK FROM CURRENT_DATE)')
+          .andWhere('EXTRACT(YEAR FROM booking.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
+        break;
+      case OverviewPeriod.THIS_MONTH:
+        queryBuilder = queryBuilder.where('EXTRACT(MONTH FROM booking.createdAt) = EXTRACT(MONTH FROM CURRENT_DATE)')
+          .andWhere('EXTRACT(YEAR FROM booking.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
+        break;
+      case OverviewPeriod.THIS_QUARTER:
+        queryBuilder = queryBuilder.where('EXTRACT(QUARTER FROM booking.createdAt) = EXTRACT(QUARTER FROM CURRENT_DATE)')
+          .andWhere('EXTRACT(YEAR FROM booking.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
+        break;
+      case OverviewPeriod.CUSTOM:
+        if (startDate && endDate) {
+          queryBuilder = queryBuilder.where('booking.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
+        } else {
+          throw new BadRequestException('Start date and end date are required for custom period');
+        }
+        break;
+      case OverviewPeriod.ALL:
+        // No additional where clause needed for all data
+        // Fetch all data without any date restrictions
+        queryBuilder = queryBuilder.where('');
+        break;
+      default:
+        throw new BadRequestException('Invalid period provided');
+    }
+
+    const overviewData = await queryBuilder.getRawOne();
+
+    return {
+      paidCount: overviewData?.paidcount,
+      totalBookingAmount: overviewData?.totalbookingamount,
+      totalBooking: overviewData?.totalbooking,
+      totalCustomers: overviewData?.totalcustomers,
+      totalPaidAmount: overviewData?.totalpaidamount,
+      totalUnpaidAmount: overviewData?.totalunpaidamount,
+      unpaidCount: overviewData?.unpaidcount,
+    };
+  }
+
 }

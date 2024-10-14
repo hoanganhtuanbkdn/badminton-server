@@ -12,8 +12,11 @@ import { GuestBookingsController } from './guest-bookings.controller';
 import { GuestBookingsService } from './guest-bookings.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Booking, Customer, BookingDetail, TimeSlot, Voucher, Court])],
-  providers: [BookingsService, GuestBookingsService],
+  imports: [
+    TypeOrmModule.forFeature([Booking, Court, Customer, BookingDetail, Voucher]),
+  ],
   controllers: [BookingsController, GuestBookingsController],
+  providers: [BookingsService, GuestBookingsService],
+  exports: [BookingsService],
 })
 export class BookingsModule { }

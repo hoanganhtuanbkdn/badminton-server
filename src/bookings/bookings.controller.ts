@@ -4,6 +4,7 @@ import { BookingsService } from './bookings.service';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto, SortOrder } from './dto';
 import { Booking } from './bookings.entity';
 import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
+import { GetDashboardOverviewDto, OverviewPeriod } from '../booking-details/dto/get-dashboard-overview.dto';
 
 @ApiTags('bookings')
 @Controller('bookings')
@@ -35,6 +36,11 @@ export class BookingsController {
     return this.bookingsService.createMultiple(createMultipleBookingsDto);
   }
 
+  @Get('overview')
+  async getOverview(@Query() getDashboardOverviewDto: GetDashboardOverviewDto) {
+    return this.bookingsService.getOverview(getDashboardOverviewDto);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all bookings with pagination, sorting, and filtering' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number' })
@@ -48,7 +54,7 @@ export class BookingsController {
     return this.bookingsService.findAll(getBookingsDto);
   }
 
-  @Get(':id')
+  @Get('detail/:id')
   @ApiOperation({ summary: 'Get a booking by ID' })
   @ApiParam({ name: 'id', description: 'ID of the booking to retrieve' })
   @ApiResponse({ status: 200, description: 'Return the booking.', type: Booking })

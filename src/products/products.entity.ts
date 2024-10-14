@@ -54,4 +54,8 @@ export class Product {
   @ApiProperty({ description: 'Last update date of the product' })
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @ApiProperty({ description: 'The priority of the product for display order', default: 0 })
+  @Column({ default: 0 })
+  priority: number;
 }

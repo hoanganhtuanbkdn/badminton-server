@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsUUID } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateProductDto {
@@ -32,4 +32,10 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   image?: string;
+
+  @ApiPropertyOptional({ description: 'Priority of the product for display order', default: 0 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  priority?: number;
 }
