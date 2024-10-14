@@ -4,7 +4,7 @@ import { BookingsService } from './bookings.service';
 import { CreateBookingDto, UpdateBookingDto, GetBookingsDto, SortOrder } from './dto';
 import { Booking } from './bookings.entity';
 import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
-import { GetDashboardOverviewDto, OverviewPeriod } from '../booking-details/dto/get-dashboard-overview.dto';
+import { GetDashboardOverviewDto } from './dto/get-dashboard-overview.dto';
 
 @ApiTags('bookings')
 @Controller('bookings')

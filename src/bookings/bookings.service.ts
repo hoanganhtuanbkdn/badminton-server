@@ -9,7 +9,7 @@ import { CreateMultipleBookingsDto } from './dto/create-multiple-bookings.dto';
 import { TimeSlot } from 'src/timeslots/timeslots.entity';
 import { Voucher } from 'src/vouchers/vouchers.entity';
 import { Court } from 'src/courts/courts.entity';
-import { GetDashboardOverviewDto, OverviewPeriod } from '../booking-details/dto/get-dashboard-overview.dto';
+import { GetDashboardOverviewDto } from './dto/get-dashboard-overview.dto';
 
 @Injectable()
 export class BookingsService {
@@ -190,8 +190,6 @@ export class BookingsService {
 
           totalAmount += bookingAmount;
         }
-
-        console.log('totalAmount', totalAmount);
 
         // Apply voucher if available
         if (booking.voucherCode) {
@@ -385,8 +383,8 @@ export class BookingsService {
     await this.bookingsRepository.delete(booking.id);
   }
 
-  async getOverview(getDashboardOverviewDto: any) {
-    const { period, startDate, endDate } = getDashboardOverviewDto;
+  async getOverview(getDashboardOverviewDto: GetDashboardOverviewDto) {
+    const { startDate, endDate, courtId, customerName } = getDashboardOverviewDto;
 
     let queryBuilder = this.bookingsRepository.createQueryBuilder('booking')
       .leftJoin('booking.customer', 'customer')
@@ -400,37 +398,19 @@ export class BookingsService {
         'COUNT(DISTINCT customer.id) as totalCustomers'
       ]);
 
-    // Calculate date range based on period
-    switch (period) {
-      case OverviewPeriod.TODAY:
-        queryBuilder = queryBuilder.where('DATE(booking.createdAt) = CURRENT_DATE');
-        break;
-      case OverviewPeriod.THIS_WEEK:
-        queryBuilder = queryBuilder.where('EXTRACT(WEEK FROM booking.createdAt) = EXTRACT(WEEK FROM CURRENT_DATE)')
-          .andWhere('EXTRACT(YEAR FROM booking.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
-        break;
-      case OverviewPeriod.THIS_MONTH:
-        queryBuilder = queryBuilder.where('EXTRACT(MONTH FROM booking.createdAt) = EXTRACT(MONTH FROM CURRENT_DATE)')
-          .andWhere('EXTRACT(YEAR FROM booking.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
-        break;
-      case OverviewPeriod.THIS_QUARTER:
-        queryBuilder = queryBuilder.where('EXTRACT(QUARTER FROM booking.createdAt) = EXTRACT(QUARTER FROM CURRENT_DATE)')
-          .andWhere('EXTRACT(YEAR FROM booking.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
-        break;
-      case OverviewPeriod.CUSTOM:
-        if (startDate && endDate) {
-          queryBuilder = queryBuilder.where('booking.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
-        } else {
-          throw new BadRequestException('Start date and end date are required for custom period');
-        }
-        break;
-      case OverviewPeriod.ALL:
-        // No additional where clause needed for all data
-        // Fetch all data without any date restrictions
-        queryBuilder = queryBuilder.where('');
-        break;
-      default:
-        throw new BadRequestException('Invalid period provided');
+    // Apply date range filter if provided
+    if (startDate && endDate) {
+      queryBuilder = queryBuilder.andWhere('booking.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
+    }
+
+    // Apply courtId filter if provided
+    if (courtId) {
+      queryBuilder = queryBuilder.andWhere('booking.courtId = :courtId', { courtId });
+    }
+
+    // Apply customerName search if provided
+    if (customerName) {
+      queryBuilder = queryBuilder.andWhere('LOWER(customer.name) LIKE LOWER(:customerName)', { customerName: `%${customerName}%` });
     }
 
     const overviewData = await queryBuilder.getRawOne();

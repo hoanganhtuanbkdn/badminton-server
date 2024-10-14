@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, DataSource } from 'typeorm';
 import { BookingDetail } from './booking-details.entity';
 import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
-import { OverviewPeriod } from './dto/get-dashboard-overview.dto';
 import { Order } from '../orders/orders.entity';
 
 @Injectable()
@@ -76,66 +75,7 @@ export class BookingDetailsService {
     }
   }
 
-  async getOverview(dto: any) {
-    const { period, startDate, endDate } = dto;
 
-    let queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
-      .leftJoin('bookingDetail.booking', 'booking')
-      .leftJoin('booking.customer', 'customer')
-      .select([
-        'COUNT(bookingDetail.id) as totalBookingDetails',
-        'SUM(booking.finalAmount) as totalBookingAmount',
-        'SUM(CASE WHEN booking.paymentStatus = \'PAID\' THEN booking.finalAmount ELSE 0 END) as totalPaidAmount',
-        'SUM(CASE WHEN booking.paymentStatus != \'PAID\' THEN booking.finalAmount ELSE 0 END) as totalUnpaidAmount',
-        'SUM(CASE WHEN booking.paymentStatus = \'PAID\' THEN 1 ELSE 0 END) as paidCount',
-        'SUM(CASE WHEN booking.paymentStatus != \'PAID\' THEN 1 ELSE 0 END) as unpaidCount',
-        'COUNT(DISTINCT customer.id) as totalCustomers'
-      ]);
-
-    switch (period) {
-      case OverviewPeriod.TODAY:
-        queryBuilder = queryBuilder.where('DATE(bookingDetail.createdAt) = CURRENT_DATE');
-        break;
-      case OverviewPeriod.THIS_WEEK:
-        queryBuilder = queryBuilder.where('EXTRACT(WEEK FROM bookingDetail.createdAt) = EXTRACT(WEEK FROM CURRENT_DATE)')
-          .andWhere('EXTRACT(YEAR FROM bookingDetail.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
-        break;
-      case OverviewPeriod.THIS_MONTH:
-        queryBuilder = queryBuilder.where('EXTRACT(MONTH FROM bookingDetail.createdAt) = EXTRACT(MONTH FROM CURRENT_DATE)')
-          .andWhere('EXTRACT(YEAR FROM bookingDetail.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
-        break;
-      case OverviewPeriod.THIS_QUARTER:
-        queryBuilder = queryBuilder.where('EXTRACT(QUARTER FROM bookingDetail.createdAt) = EXTRACT(QUARTER FROM CURRENT_DATE)')
-          .andWhere('EXTRACT(YEAR FROM bookingDetail.createdAt) = EXTRACT(YEAR FROM CURRENT_DATE)');
-        break;
-      case OverviewPeriod.CUSTOM:
-        if (startDate && endDate) {
-          queryBuilder = queryBuilder.where('bookingDetail.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
-        } else {
-          throw new BadRequestException('Start date and end date are required for custom period');
-        }
-        break;
-      case OverviewPeriod.ALL:
-        // No additional where clause needed for all data
-        // Fetch all data without any date restrictions
-        queryBuilder = queryBuilder.where('');
-        break;
-      default:
-        throw new BadRequestException('Invalid period provided');
-    }
-
-    const overviewData = await queryBuilder.getRawOne();
-
-    return {
-      paidCount: overviewData?.paidcount,
-      totalBookingAmount: overviewData?.totalbookingamount,
-      totalBookingDetails: overviewData?.totalbookingdetails,
-      totalCustomers: overviewData?.totalcustomers,
-      totalPaidAmount: overviewData?.totalpaidamount,
-      totalUnpaidAmount: overviewData?.totalunpaidamount,
-      unpaidCount: overviewData?.unpaidcount,
-    };
-  }
 
   async findOne(id: string): Promise<BookingDetail> {
     const bookingDetail = await this.bookingDetailsRepository.findOne({

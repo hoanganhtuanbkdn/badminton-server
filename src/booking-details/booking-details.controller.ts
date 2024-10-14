@@ -3,7 +3,6 @@ import { BookingDetailsService } from './booking-details.service';
 import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { BookingDetail } from './booking-details.entity';
-import { GetDashboardOverviewDto, OverviewPeriod } from './dto/get-dashboard-overview.dto';
 
 @ApiTags('booking-details')
 @Controller('booking-details')
