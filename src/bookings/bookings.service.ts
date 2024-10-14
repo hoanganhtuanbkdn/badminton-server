@@ -285,10 +285,15 @@ export class BookingsService {
     // Update customer if provided
     if (customer) {
       let existingCustomer = await this.customersRepository.findOne({
-        where: { name: customer.name, phoneNumber: customer.phoneNumber }
+        where: { id: booking.customerId }
       });
 
-      if (!existingCustomer) {
+      if (existingCustomer) {
+        // Update existing customer with new information
+        Object.assign(existingCustomer, customer);
+        existingCustomer = await this.customersRepository.save(existingCustomer);
+      } else {
+        // If customer doesn't exist, create a new one
         existingCustomer = this.customersRepository.create(customer);
         existingCustomer = await this.customersRepository.save(existingCustomer);
       }
