@@ -45,4 +45,10 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
   orderItems: CreateOrderItemDto[];
+
+  // Add this new property
+  @ApiProperty({ description: 'The name of the customer', required: false })
+  @IsString()
+  @IsOptional()
+  customerName?: string;
 }

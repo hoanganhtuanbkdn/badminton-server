@@ -39,6 +39,7 @@ export class OrdersService {
         paymentMethod: createOrderDto.paymentMethod,
         orderCode: createOrderDto.orderCode,
         totalAmount: createOrderDto.totalAmount,
+        customerName: createOrderDto.customerName,
       });
       const savedOrder = await queryRunner.manager.save(order);
 
@@ -127,6 +128,7 @@ export class OrdersService {
         status: updateOrderDto.status,
         paymentMethod: updateOrderDto.paymentMethod,
         totalAmount: updateOrderDto.totalAmount,
+        customerName: updateOrderDto.customerName,
       });
       const updatedOrder = await queryRunner.manager.save(order);
 

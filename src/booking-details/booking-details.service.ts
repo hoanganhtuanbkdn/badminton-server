@@ -29,6 +29,7 @@ export class BookingDetailsService {
         .leftJoinAndSelect('bookingDetail.position', 'position')
         .leftJoinAndSelect('bookingDetail.court', 'court')
         .leftJoinAndSelect('bookingDetail.owner', 'owner')
+        .leftJoinAndSelect('bookingDetail.orders', 'orders')
         .leftJoinAndSelect('booking.customer', 'customer')
         .leftJoinAndSelect('booking.payments', 'payments')
         .orderBy(`bookingDetail.${sortBy}`, sortOrder);
