@@ -13,6 +13,17 @@ class CreateOrderItemDto {
   @IsNumber()
   @IsNotEmpty()
   quantity: number;
+
+
+  @ApiProperty({ description: 'The notes of the order item', example: 'Special instructions' })
+  @IsString()
+  @IsOptional()
+  notes: string;
+
+  @ApiProperty({ description: 'The name of the customer', required: false })
+  @IsString()
+  @IsOptional()
+  customerName?: string;
 }
 
 export class CreateOrderDto {
@@ -45,10 +56,4 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
   orderItems: CreateOrderItemDto[];
-
-  // Add this new property
-  @ApiProperty({ description: 'The name of the customer', required: false })
-  @IsString()
-  @IsOptional()
-  customerName?: string;
 }

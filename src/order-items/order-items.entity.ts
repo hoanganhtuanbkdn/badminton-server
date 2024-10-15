@@ -56,6 +56,10 @@ export class OrderItem {
   @Column({ nullable: true })
   notes: string;
 
+  @ApiProperty({ description: 'The name of the customer', required: false })
+  @Column({ nullable: true })
+  customerName: string;
+
   @ApiProperty({ description: 'Created at', example: '2024-01-01T00:00:00Z' })
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

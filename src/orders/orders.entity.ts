@@ -64,9 +64,4 @@ export class Order {
   @ApiProperty({ description: 'The date and time when the order was last updated' })
   @UpdateDateColumn()
   updatedAt: Date;
-
-  // Add this new column
-  @ApiProperty({ description: 'The name of the customer', required: false })
-  @Column({ nullable: true })
-  customerName: string;
 }

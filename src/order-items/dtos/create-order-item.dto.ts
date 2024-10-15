@@ -31,4 +31,9 @@ export class CreateOrderItemDto {
   @IsString()
   @IsOptional()
   notes: string;
+
+  @ApiProperty({ description: 'The name of the customer', required: false })
+  @IsString()
+  @IsOptional()
+  customerName?: string;
 }
