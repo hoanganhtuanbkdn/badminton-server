@@ -23,14 +23,14 @@ export class Order {
   @Column({ unique: true })
   orderCode: string;
 
-  @ApiProperty({ description: 'The ID of the booking detail associated with this order' })
-  @Column({ name: 'booking_detail_id' })
-  bookingDetailId: string;
+  @ApiProperty({ description: 'The ID of the booking detail associated with this order', required: false, nullable: true })
+  @Column({ name: 'booking_detail_id', nullable: true })
+  bookingDetailId: string | null;
 
-  @ApiProperty({ description: 'The booking detail associated with this order', type: () => BookingDetail })
-  @ManyToOne(() => BookingDetail, bookingDetail => bookingDetail.orders)
+  @ApiProperty({ description: 'The booking detail associated with this order', type: () => BookingDetail, required: false })
+  @ManyToOne(() => BookingDetail, bookingDetail => bookingDetail.orders, { nullable: true })
   @JoinColumn({ name: 'booking_detail_id' })
-  bookingDetail: BookingDetail;
+  bookingDetail: BookingDetail | null;
 
   @ApiProperty({ description: 'The items in this order', type: () => [OrderItem] })
   @OneToMany(() => OrderItem, orderItem => orderItem.order)

@@ -28,13 +28,16 @@ export class OrdersService {
     await queryRunner.startTransaction();
 
     try {
-      const bookingDetail = await this.bookingDetailRepository.findOne({ where: { id: createOrderDto.bookingDetailId } });
-      if (!bookingDetail) {
-        throw new NotFoundException(`BookingDetail with ID "${createOrderDto.bookingDetailId}" not found`);
+      let bookingDetail: BookingDetail | null = null;
+      if (createOrderDto.bookingDetailId) {
+        bookingDetail = await this.bookingDetailRepository.findOne({ where: { id: createOrderDto.bookingDetailId } });
+        if (!bookingDetail) {
+          throw new NotFoundException(`BookingDetail with ID "${createOrderDto.bookingDetailId}" not found`);
+        }
       }
 
       const order = this.ordersRepository.create({
-        bookingDetailId: createOrderDto.bookingDetailId,
+        bookingDetailId: createOrderDto.bookingDetailId || null,
         status: createOrderDto.status,
         paymentMethod: createOrderDto.paymentMethod,
         orderCode: createOrderDto.orderCode,

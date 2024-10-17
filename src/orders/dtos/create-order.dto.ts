@@ -27,11 +27,10 @@ class CreateOrderItemDto {
 }
 
 export class CreateOrderDto {
-  @ApiProperty({ description: 'The ID of the associated booking detail' })
+  @ApiProperty({ description: 'The ID of the associated booking detail', required: false })
   @IsString()
-  @IsNotEmpty()
-  bookingDetailId: string;
-
+  @IsOptional()
+  bookingDetailId?: string;
 
   @ApiProperty({ description: 'The Order code of the order' })
   @IsString()
