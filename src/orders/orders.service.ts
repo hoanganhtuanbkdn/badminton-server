@@ -101,9 +101,9 @@ export class OrdersService {
       ...order,
       bookingDetail: {
         ...order.bookingDetail,
-        court: order.bookingDetail.court,
-        position: order.bookingDetail.position,
-        owner: order.bookingDetail.owner
+        court: order?.bookingDetail?.court,
+        position: order?.bookingDetail?.position,
+        owner: order?.bookingDetail?.owner
       }
     }));
 
