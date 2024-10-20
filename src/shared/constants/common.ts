@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { AdminProfile } from 'src/admin';
 import { v4 as uuidv4 } from 'uuid';
 
 export const REQUEST_ID_TOKEN_HEADER = 'x-request-id';
@@ -945,7 +946,7 @@ export type TAuthenticationJWT = {
   verifyType: TypeVerifyPhone;
   accessToken?: string;
   refreshToken?: string;
-  user?: TAuthenticationUserInfo;
+  user?: AdminProfile;
   rolePermission?: {
     agency: RolePermission;
     teamAgency: RolePermission;

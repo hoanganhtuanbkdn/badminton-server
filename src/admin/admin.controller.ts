@@ -74,8 +74,6 @@ export class AdminController implements CrudController<AdminProfile> {
   @UseGuards(JwtRefreshGuard)
   @Get('refresh-token')
   async refreshToken(@ReqContext() ctx: RequestContext) {
-    console.log('ctx.user', ctx.user);
-
     if (ctx?.user && ctx?.user?.roles.includes(ROLE.SUPER_ADMIN)) {
       const admin = await this.service.getAdminByToken(ctx.user.id);
       const authToken = await this.service.generateTokenAdmin({
@@ -214,18 +212,7 @@ export class AdminController implements CrudController<AdminProfile> {
         verifyType: 'email',
         roles: [ROLE.SUPER_ADMIN],
         ...authToken,
-        user: {
-          id,
-          userName: '',
-          primaryPhone: mobileNo,
-          firstName,
-          lastName,
-          roles: [ROLE.SUPER_ADMIN],
-          email,
-          createdAt: createDate.toString(),
-          updatedAt: updateDate.toString(),
-          imagePath
-        },
+        user: admin,
         rolePermission: dataPermission
       },
     };
