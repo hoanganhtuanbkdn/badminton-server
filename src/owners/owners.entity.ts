@@ -58,7 +58,6 @@ export class Owner {
   @Column({ nullable: true })
   accountNo: string;
 
-
   @ApiProperty({
     description: 'Mã định danh ngân hàng (thường gọi là BIN) 6 chữ số, quy đinh bởi ngân hàng nước',
     example: '1234567890',

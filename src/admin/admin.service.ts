@@ -18,6 +18,7 @@ import { Repository } from 'typeorm';
 import { REDIS_KEY_FORGOT, REDIS_KEY_SIGNIN } from './constants';
 import { AdminProfile, AdminRole, AdminRolePermission } from './entities';
 import { AuthLoginAdminDto, OTPEmailDTO, ResetPasswordDTO } from './dtos';
+import { Owner } from 'src/owners/owners.entity';
 
 @Injectable()
 export class AdminService extends TypeOrmCrudService<AdminProfile> {
@@ -54,34 +55,45 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
     data: TAuthenticationJWT
   }> {
     const { email, password } = data;
-    // check admin table
     const admin = await this.adminProfileRepository.findOne({
       where: { email },
       relations: {
         role: true,
+        owner: true,
       },
     });
 
-    if (admin) {
-
-      if (admin.status === ACCOUNT_STATUS.INACTIVE) {
-        throw BaseError.ACCOUNT_INACTIVE_UNABLE_TO_PROCEED();
-      }
-
-      await this.validateEmailPassword(admin, password, ROLE.SUPER_ADMIN);
-
-      // send OTP code to superadmin email
-      this.commonService.sendOtpToEmail(email, admin.firstName, admin.lastName, REDIS_KEY_SIGNIN);
-
-      return {
-        data: {
-          email,
-          verifyType: 'email',
-          roles: [ROLE.SUPER_ADMIN],
-        },
-      };
-
+    console.log('admin', admin);
+    if (!admin) {
+      throw BaseError.EMAIL_NOT_EXIST();
     }
+
+    if (admin.status === ACCOUNT_STATUS.INACTIVE) {
+      throw BaseError.ACCOUNT_INACTIVE_UNABLE_TO_PROCEED();
+    }
+
+    await this.validateEmailPassword(admin, password, ROLE.SUPER_ADMIN);
+
+    const { id, mobileNo, firstName, lastName, imagePath, createDate, updateDate, owner } = admin;
+
+    const authToken = await this.generateTokenAdmin({
+      id,
+      email,
+      roles: [ROLE.SUPER_ADMIN],
+    });
+
+    const dataPermission = await this.getPermission(ROLE.SUPER_ADMIN);
+
+    return {
+      data: {
+        email,
+        verifyType: 'email',
+        roles: [ROLE.SUPER_ADMIN],
+        ...authToken,
+        user: admin,
+        rolePermission: dataPermission
+      },
+    };
   }
   async loginResentOTP(email: string): Promise<{
     data: TAuthenticationJWT
@@ -271,11 +283,11 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
             userData.email,
             userData.firstName + ' ' + userData.lastName,
           );
-          if (role === ROLE.SUPER_ADMIN) {
-            await this.adminProfileRepository.update(userData.id, {
-              status: ACCOUNT_STATUS.LOCKED
-            });
-          }
+          // if (role === ROLE.SUPER_ADMIN) {
+          //   await this.adminProfileRepository.update(userData.id, {
+          //     status: ACCOUNT_STATUS.LOCKED
+          //   });
+          // }
 
           throw new HttpException(
             {
@@ -314,22 +326,23 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
         );
       }
 
-      if (role === ROLE.SUPER_ADMIN && userData.status === ACCOUNT_STATUS.LOCKED) {
-        await this.adminProfileRepository.update(userData.id, {
-          status: ACCOUNT_STATUS.ACTIVE
-        });
-      }
+      // if (role === ROLE.SUPER_ADMIN && userData.status === ACCOUNT_STATUS.LOCKED) {
+      //   await this.adminProfileRepository.update(userData.id, {
+      //     status: ACCOUNT_STATUS.ACTIVE
+      //   });
+      // }
       return true;
     }
   }
 
-  async generateTokenAdmin(user: UserAccessTokenClaims): Promise<AuthTokenOutput> {
+  async generateTokenAdmin(user: UserAccessTokenClaims & { ownerId?: string }): Promise<AuthTokenOutput> {
     try {
-      const subject = { sub: user.id, roles: user.roles, };
+      const subject = { sub: user.id, roles: user.roles, ownerId: user.ownerId };
       const payload = {
         email: user.email,
         sub: user.id,
         roles: user.roles,
+        ownerId: user.ownerId,
       };
       const authToken = {
         refreshToken: this.jwtService.sign(subject, {
@@ -358,6 +371,7 @@ export class AdminService extends TypeOrmCrudService<AdminProfile> {
       where: { id },
       relations: {
         role: true,
+        owner: true,
       },
     });
   }

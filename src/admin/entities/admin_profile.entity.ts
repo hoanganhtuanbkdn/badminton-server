@@ -13,10 +13,13 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  OneToOne,
+  JoinColumn
 } from 'typeorm';
 import { v4 as uuid4 } from 'uuid';
 import { AdminRole } from './admin_role.entity';
+import { Owner } from 'src/owners/owners.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity({ name: 'admin' })
@@ -122,6 +125,16 @@ export class AdminProfile extends BaseEntity {
   })
   @IsOptional({ groups: [CREATE, UPDATE] })
   status: ACCOUNT_STATUS;
+
+  @Column({ name: 'owner_id', nullable: true })
+  @ApiPropertyOptional({
+    description: 'ID of the associated owner',
+  })
+  ownerId: string;
+
+  @OneToOne(() => Owner, { nullable: true })
+  @JoinColumn({ name: 'owner_id' })
+  owner: Owner;
 
   @CreateDateColumn({ name: 'create_date' })
   createDate: Date;
