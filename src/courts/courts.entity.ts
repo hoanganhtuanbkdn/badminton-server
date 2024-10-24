@@ -8,6 +8,7 @@ import { BookingDetail } from 'src/booking-details/booking-details.entity';
 import { slugify } from 'src/shared/utils';
 import { Product } from 'src/products/products.entity';
 import { ProductCategory } from 'src/product-categories/product-categories.entity';
+import { Order } from 'src/orders/orders.entity';
 
 @Entity('courts')
 export class Court {

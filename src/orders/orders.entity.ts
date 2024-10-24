@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { BookingDetail } from '../booking-details/booking-details.entity';
 import { OrderItem } from '../order-items/order-items.entity';
+import { Court } from '../courts/courts.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum OrderStatus {
@@ -64,4 +65,5 @@ export class Order {
   @ApiProperty({ description: 'The date and time when the order was last updated' })
   @UpdateDateColumn()
   updatedAt: Date;
+
 }

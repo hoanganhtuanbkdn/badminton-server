@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderDto, GetOrderDto } from './dtos';
+import { CreateOrderDto, UpdateOrderDto, GetOrderDto, OrderOverviewDto } from './dtos';
 import { Order } from './orders.entity';
 import { CreateOrderItemDto } from '../order-items/dtos/create-order-item.dto';
 import { OrderItem } from '../order-items/order-items.entity';
 import { PaymentMethod } from './orders.entity';
+import { OrderType } from './dtos/get-order.dto';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -28,12 +29,19 @@ export class OrdersController {
   @ApiQuery({ name: 'sortBy', required: false, description: 'Field to sort by' })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
   @ApiQuery({ name: 'bookingDetailId', required: false, description: 'Filter by booking detail ID' })
+  @ApiQuery({ name: 'courtId', required: false, description: 'Filter by court ID' })
+  @ApiQuery({ name: 'positionId', required: false, description: 'Filter by position ID' })
+  @ApiQuery({ name: 'paymentStatus', required: false, description: 'Filter by payment status (e.g., PAID, UNPAID)' })
+  @ApiQuery({ name: 'customerName', required: false, description: 'Search by customer name' })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Start date for filtering by bookingDate' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'End date for filtering by bookingDate' })
+  @ApiQuery({ name: 'type', required: false, enum: OrderType, description: 'Filter by order type (ALL, WALK_IN, BOOKING)' })
   @ApiResponse({ status: 200, description: 'Return all orders with pagination, sorting, and filtering.', type: [Order] })
   findAll(@Query() getOrdersDto: GetOrderDto): Promise<{ data: Order[]; total: number; page?: number; limit?: number }> {
     return this.ordersService.findAll(getOrdersDto);
   }
 
-  @Get(':id')
+  @Get(':id/detail')
   @ApiOperation({ summary: 'Get an order by ID' })
   @ApiParam({ name: 'id', description: 'ID of the order to retrieve' })
   @ApiResponse({ status: 200, description: 'Return the order.', type: Order })
@@ -104,5 +112,32 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Order not found.' })
   addOrderItems(@Param('orderId') orderId: string, @Body() createOrderItemDtos: CreateOrderItemDto[]): Promise<OrderItem[]> {
     return this.ordersService.addOrderItems(orderId, createOrderItemDtos);
+  }
+
+  @Get('overview')
+  @ApiOperation({ summary: 'Get orders overview' })
+  @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Start date for filtering, ex: 2024-01-01' })
+  @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date for filtering, ex: 2024-01-01' })
+  @ApiQuery({ name: 'customerName', required: false, type: String, description: 'Customer name for filtering' })
+  @ApiQuery({ name: 'courtId', required: false, type: String, description: 'Court ID for filtering' })
+  @ApiQuery({ name: 'positionId', required: false, type: String, description: 'Position ID for filtering' })
+  @ApiQuery({ name: 'type', required: false, enum: OrderType, description: 'Order type for filtering' })
+  @ApiResponse({ status: 200, description: 'Return the orders overview.', type: OrderOverviewDto })
+  getOverview(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('customerName') customerName?: string,
+    @Query('courtId') courtId?: string,
+    @Query('positionId') positionId?: string,
+    @Query('type') type?: OrderType
+  ): Promise<OrderOverviewDto> {
+    return this.ordersService.getOverview({
+      startDate,
+      endDate,
+      customerName,
+      courtId,
+      positionId,
+      type,
+    });
   }
 }

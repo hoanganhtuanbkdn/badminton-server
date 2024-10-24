@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Brackets, IsNull, Not, Between } from 'typeorm';
 import { Order, OrderStatus, PaymentMethod } from './orders.entity';
 import { OrderItem } from '../order-items/order-items.entity';
 import { Product } from '../products/products.entity';
 import { BookingDetail } from '../booking-details/booking-details.entity';
-import { CreateOrderDto, UpdateOrderDto, GetOrderDto } from './dtos';
+import { CreateOrderDto, UpdateOrderDto, GetOrderDto, OrderType } from './dtos';
 import { CreateOrderItemDto } from '../order-items/dtos/create-order-item.dto';
+import { OrderOverviewDto } from './dtos/order-overview.dto';
 
 @Injectable()
 export class OrdersService {
@@ -73,7 +74,20 @@ export class OrdersService {
   }
 
   async findAll(getOrderDto: GetOrderDto): Promise<{ data: Order[]; total: number; page?: number; limit?: number }> {
-    const { page, limit, sortBy = 'createdAt', sortOrder = 'DESC', bookingDetailId } = getOrderDto;
+    const {
+      page,
+      limit,
+      sortBy = 'createdAt',
+      sortOrder = 'DESC',
+      bookingDetailId,
+      courtId,
+      positionId,
+      paymentStatus,
+      customerName,
+      startDate,
+      endDate,
+      type = OrderType.ALL
+    } = getOrderDto;
 
     const queryBuilder = this.ordersRepository.createQueryBuilder('order')
       .leftJoinAndSelect('order.orderItems', 'orderItems')
@@ -81,11 +95,44 @@ export class OrdersService {
       .leftJoinAndSelect('order.bookingDetail', 'bookingDetail')
       .leftJoinAndSelect('bookingDetail.court', 'court')
       .leftJoinAndSelect('bookingDetail.position', 'position')
-      .leftJoinAndSelect('bookingDetail.booking', 'booking')
-      .leftJoinAndSelect('booking.customer', 'customer');
+
+    // Handle the new 'type' parameter
+    if (type === OrderType.WALK_IN) {
+      queryBuilder.andWhere('order.bookingDetailId IS NULL');
+    } else if (type === OrderType.BOOKING) {
+      queryBuilder.andWhere('order.bookingDetailId IS NOT NULL');
+    }
 
     if (bookingDetailId) {
       queryBuilder.andWhere('order.bookingDetailId = :bookingDetailId', { bookingDetailId });
+    }
+
+    if (courtId) {
+      queryBuilder.andWhere('court.id = :courtId', { courtId });
+    }
+
+    if (positionId) {
+      queryBuilder.andWhere('position.id = :positionId', { positionId });
+    }
+
+    // if (ownerId) {
+    //   queryBuilder.andWhere('bookingDetail.ownerId = :ownerId', { ownerId });
+    // }
+
+    if (paymentStatus) {
+      queryBuilder.andWhere('order.status = :paymentStatus', { paymentStatus });
+    }
+
+    if (customerName) {
+      queryBuilder.andWhere(
+        new Brackets(qb => {
+          qb.where('orderItems.customerName LIKE :customerName', { customerName: `%${customerName}%` })
+        })
+      );
+    }
+
+    if (startDate && endDate) {
+      queryBuilder.andWhere('order.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
     }
 
     queryBuilder.orderBy(`order.${sortBy}`, sortOrder);
@@ -99,12 +146,12 @@ export class OrdersService {
     // Transform the data to include nested objects
     const transformedData = data.map(order => ({
       ...order,
-      bookingDetail: {
+      bookingDetail: order.bookingDetail ? {
         ...order.bookingDetail,
-        court: order?.bookingDetail?.court,
-        position: order?.bookingDetail?.position,
-        owner: order?.bookingDetail?.owner
-      }
+        court: order.bookingDetail.court,
+        position: order.bookingDetail.position,
+        owner: order.bookingDetail.owner
+      } : null
     }));
 
     return { data: transformedData, total, page, limit };
@@ -281,5 +328,79 @@ export class OrdersService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getOverview(filters: {
+    startDate?: string;
+    endDate?: string;
+    customerName?: string;
+    courtId?: string;
+    positionId?: string;
+    type?: OrderType;
+  }): Promise<OrderOverviewDto> {
+    const queryBuilder = this.ordersRepository.createQueryBuilder('order')
+      .leftJoin('order.bookingDetail', 'bookingDetail')
+      .leftJoin('bookingDetail.court', 'court')
+      .leftJoin('bookingDetail.position', 'position')
+      .leftJoin('order.orderItems', 'orderItems');
+
+    if (filters.startDate && filters.endDate) {
+      queryBuilder.andWhere('order.createdAt BETWEEN :startDate AND :endDate', {
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+      });
+    }
+
+    if (filters.customerName) {
+      queryBuilder.andWhere('orderItems.customerName LIKE :customerName', {
+        customerName: `%${filters.customerName}%`,
+      });
+    }
+
+    if (filters.courtId) {
+      queryBuilder.andWhere('court.id = :courtId', { courtId: filters.courtId });
+    }
+
+    if (filters.positionId) {
+      queryBuilder.andWhere('position.id = :positionId', { positionId: filters.positionId });
+    }
+
+    if (filters.type) {
+      if (filters.type === OrderType.WALK_IN) {
+        queryBuilder.andWhere('order.bookingDetailId IS NULL');
+      } else if (filters.type === OrderType.BOOKING) {
+        queryBuilder.andWhere('order.bookingDetailId IS NOT NULL');
+      }
+    }
+
+    const [
+      { totalOrders, totalRevenue },
+      { paidOrders, paidRevenue },
+      { unpaidOrders, unpaidRevenue },
+    ] = await Promise.all([
+      queryBuilder.clone()
+        .select('COUNT(DISTINCT order.id)', 'totalOrders')
+        .addSelect('SUM(order.totalAmount)', 'totalRevenue')
+        .getRawOne(),
+      queryBuilder.clone()
+        .andWhere('order.status = :status', { status: OrderStatus.PAID })
+        .select('COUNT(DISTINCT order.id)', 'paidOrders')
+        .addSelect('SUM(order.totalAmount)', 'paidRevenue')
+        .getRawOne(),
+      queryBuilder.clone()
+        .andWhere('order.status = :status', { status: OrderStatus.UNPAID })
+        .select('COUNT(DISTINCT order.id)', 'unpaidOrders')
+        .addSelect('SUM(order.totalAmount)', 'unpaidRevenue')
+        .getRawOne(),
+    ]);
+
+    return {
+      totalOrders: Number(totalOrders) || 0,
+      totalRevenue: Number(totalRevenue) || 0,
+      paidOrders: Number(paidOrders) || 0,
+      paidRevenue: Number(paidRevenue) || 0,
+      unpaidOrders: Number(unpaidOrders) || 0,
+      unpaidRevenue: Number(unpaidRevenue) || 0,
+    };
   }
 }
