@@ -37,6 +37,12 @@ export class BookingsController {
   }
 
   @Get('overview')
+  @ApiOperation({ summary: 'Get dashboard overview' })
+  @ApiQuery({ name: 'startDate', required: true, type: Date, description: 'Start date for the overview' })
+  @ApiQuery({ name: 'endDate', required: true, type: Date, description: 'End date for the overview' })
+  @ApiQuery({ name: 'courtId', required: false, type: String, description: 'Filter by court ID' })
+  @ApiQuery({ name: 'positionId', required: false, type: String, description: 'Filter by position ID' })
+  @ApiResponse({ status: 200, description: 'Return the dashboard overview.' })
   async getOverview(@Query() getDashboardOverviewDto: GetDashboardOverviewDto) {
     return this.bookingsService.getOverview(getDashboardOverviewDto);
   }

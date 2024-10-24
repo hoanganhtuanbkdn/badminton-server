@@ -18,6 +18,11 @@ export class GetDashboardOverviewDto {
   @IsOptional()
   courtId?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by position ID' })
+  @IsString()
+  @IsOptional()
+  positionId?: string;
+
   @ApiPropertyOptional({ description: 'Search by customer name' })
   @IsString()
   @IsOptional()

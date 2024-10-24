@@ -389,7 +389,7 @@ export class BookingsService {
   }
 
   async getOverview(getDashboardOverviewDto: GetDashboardOverviewDto) {
-    const { startDate, endDate, courtId, customerName } = getDashboardOverviewDto;
+    const { startDate, endDate, courtId, positionId, customerName } = getDashboardOverviewDto;
 
     let queryBuilder = this.bookingsRepository.createQueryBuilder('booking')
       .leftJoin('booking.customer', 'customer')
@@ -411,6 +411,10 @@ export class BookingsService {
     // Apply courtId filter if provided
     if (courtId) {
       queryBuilder = queryBuilder.andWhere('booking.courtId = :courtId', { courtId });
+    }
+
+    if (positionId) {
+      queryBuilder = queryBuilder.andWhere('booking.positionId = :positionId', { positionId });
     }
 
     // Apply customerName search if provided

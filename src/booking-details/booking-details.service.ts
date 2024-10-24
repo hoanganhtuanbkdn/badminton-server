@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, DataSource } from 'typeorm';
+import { Brackets, Repository, DataSource, In } from 'typeorm';
 import { BookingDetail } from './booking-details.entity';
 import { CreateBookingDetailDto, UpdateBookingDetailDto, GetBookingDetailsDto, SortByFields, SortOrder } from './dto';
 import { Order } from '../orders/orders.entity';
@@ -22,7 +22,19 @@ export class BookingDetailsService {
 
   async findAll(getBookingDetailsDto: GetBookingDetailsDto): Promise<{ data: BookingDetail[]; total: number, page: number, limit?: number }> {
     try {
-      const { page = 1, limit, sortBy = SortByFields.CREATED_AT, sortOrder = SortOrder.DESC, courtId, positionId, ownerId, paymentStatus, customerName, startDate, endDate } = getBookingDetailsDto;
+      const {
+        page = 1,
+        limit,
+        sortBy = SortByFields.CREATED_AT,
+        sortOrder = SortOrder.DESC,
+        courtId,
+        positionId,
+        ownerId,
+        paymentStatus,
+        customerName,
+        startDate,
+        endDate
+      } = getBookingDetailsDto;
 
       const queryBuilder = this.bookingDetailsRepository.createQueryBuilder('bookingDetail')
         .leftJoinAndSelect('bookingDetail.booking', 'booking')
