@@ -37,7 +37,8 @@ export class PositionsService {
   async findAll(getPositionsDto: GetPositionsDto): Promise<{ data: Position[]; total: number }> {
     const { page, limit, sortBy, sortOrder } = getPositionsDto;
 
-    const queryBuilder = this.positionsRepository.createQueryBuilder('position');
+    const queryBuilder = this.positionsRepository.createQueryBuilder('position')
+      .leftJoinAndSelect('position.court', 'court');
 
     if (sortBy && sortOrder) {
       queryBuilder.orderBy(`position.${sortBy}`, sortOrder);

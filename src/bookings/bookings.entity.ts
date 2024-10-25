@@ -169,6 +169,13 @@ export class Booking {
   court: Court;
 
   @ApiProperty({
+    description: 'Position ID for the booking',
+    example: 'uuid',
+  })
+  @Column({ name: 'position_id', nullable: true })
+  positionId: string;
+
+  @ApiProperty({
     description: 'List of booking details associated with this booking',
     type: () => [BookingDetail],
   })
