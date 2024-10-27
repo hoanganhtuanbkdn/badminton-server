@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   app:
-    container_name: badminton_website_${APP_ENV}
-    image: badminton_website-api-${APP_ENV}:1.0.0
+    container_name: badminton_server_prod
+    image: badminton_server_prod:1.0.0
     build:
       context: .
       dockerfile: ./Dockerfile
     command: npm run start
     ports:
-      - '${APP_PORT}:8000'
+      - 8001:8001
     volumes:
       - ./src:/app/src
     env_file:
@@ -23,15 +23,15 @@ services:
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       NODE_OPTIONS: --max-old-space-size=4096
-      VIRTUAL_HOST: courtapi.bstar-badminton.com
-      LETSENCRYPT_HOST: courtapi.bstar-badminton.com
+      VIRTUAL_HOST: apiw.bstar-badminton.com
+      LETSENCRYPT_HOST: apiw.bstar-badminton.com
     depends_on:
       - pgsqldb
       - redis
     restart: unless-stopped
 
   pgsqldb:
-    container_name: badminton_website_pgsqldb_${APP_ENV}
+    container_name: badminton_prod_pgsqldb
     image: postgres:14.3
     env_file:
       - .env
@@ -40,23 +40,24 @@ services:
       POSTGRES_PASSWORD: '${DB_PASS}'
       POSTGRES_DB: '${DB_NAME}'
     ports:
-      - '${DB_PORT}:5432'
+      - 5433:5432
     volumes:
-      - pgsqldata:/var/lib/postgresql/data
+      - badminton_prod_pgsqldata:/var/lib/postgresql/data
 
   redis:
-    container_name: badminton_website_redis_${APP_ENV}
+    container_name: badminton_prod_redis
     restart: always
     image: redis:6.0-alpine
     ports:
-      - '${REDIS_PORT}:6379'
+      - '6380:6379'
     volumes:
-      - redisdata:/data
+      - badminton_prod_redis_data:/data
 
 volumes:
-  pgsqldata:
-  redisdata:
+  badminton_prod_redis_data:
+  badminton_prod_pgsqldata:
 
 networks:
   default:
-    name: ${APP_ENV}
+    name: myapp
+    external: true
